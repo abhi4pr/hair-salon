@@ -1,9 +1,9 @@
-const Service = require('../models/Service');
-const Salon = require('../models/Salon');
-const AppError = require('../../errors/AppError');
-const asyncHandler = require('../utils/asyncHandler');
-const { success } = require('../utils/apiResponse');
-const { uploadToImageKit, deleteFromImageKit } = require('../middlewares/upload.middleware');
+import Service from '../models/Service.js';
+import Salon from '../models/Salon.js';
+import AppError from '../../errors/AppError.js';
+import asyncHandler from '../utils/asyncHandler.js';
+import { success } from '../utils/apiResponse.js';
+import { uploadToImageKit, deleteFromImageKit } from '../middlewares/upload.middleware.js';
 
 const getSalonForOwner = async (ownerId) => {
   const salon = await Salon.findOne({ owner: ownerId });
@@ -11,7 +11,7 @@ const getSalonForOwner = async (ownerId) => {
   return salon;
 };
 
-exports.createService = asyncHandler(async (req, res) => {
+export const createService = asyncHandler(async (req, res) => {
   const salon = await getSalonForOwner(req.user._id);
   if (req.file) {
     const { url, fileId } = await uploadToImageKit(req.file, 'service-images');
@@ -22,18 +22,18 @@ exports.createService = asyncHandler(async (req, res) => {
   success(res, 'Service created', service, 201);
 });
 
-exports.getServicesBySalon = asyncHandler(async (req, res) => {
+export const getServicesBySalon = asyncHandler(async (req, res) => {
   const services = await Service.find({ salon: req.params.salonId, isActive: true });
   success(res, 'Services fetched', services);
 });
 
-exports.getMyServices = asyncHandler(async (req, res) => {
+export const getMyServices = asyncHandler(async (req, res) => {
   const salon = await getSalonForOwner(req.user._id);
   const services = await Service.find({ salon: salon._id });
   success(res, 'Services fetched', services);
 });
 
-exports.updateService = asyncHandler(async (req, res) => {
+export const updateService = asyncHandler(async (req, res) => {
   const salon = await getSalonForOwner(req.user._id);
   const service = await Service.findOne({ _id: req.params.id, salon: salon._id });
   if (!service) throw new AppError('Service not found', 404);
@@ -50,7 +50,7 @@ exports.updateService = asyncHandler(async (req, res) => {
   success(res, 'Service updated', service);
 });
 
-exports.deleteService = asyncHandler(async (req, res) => {
+export const deleteService = asyncHandler(async (req, res) => {
   const salon = await getSalonForOwner(req.user._id);
   const service = await Service.findOne({ _id: req.params.id, salon: salon._id });
   if (!service) throw new AppError('Service not found', 404);

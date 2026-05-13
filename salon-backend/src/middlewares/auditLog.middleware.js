@@ -1,6 +1,6 @@
-const AuditLog = require('../models/AuditLog');
+import AuditLog from '../models/AuditLog.js';
 
-const auditLog = (action, resource) => async (req, res, next) => {
+export const auditLog = (action, resource) => async (req, res, next) => {
   res.on('finish', async () => {
     if (res.statusCode < 400) {
       try {
@@ -17,5 +17,3 @@ const auditLog = (action, resource) => async (req, res, next) => {
   });
   next();
 };
-
-module.exports = { auditLog };

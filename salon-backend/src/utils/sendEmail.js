@@ -1,14 +1,13 @@
-const { transporter } = require('../config/mailer');
+import { transporter } from '../config/mailer.js';
 
 const sendEmail = async ({ to, subject, html, text }) => {
-  const mailOptions = {
+  await transporter.sendMail({
     from: `"Salon App" <${process.env.GMAIL_USER}>`,
     to,
     subject,
     html,
     text,
-  };
-  await transporter.sendMail(mailOptions);
+  });
 };
 
-module.exports = sendEmail;
+export default sendEmail;

@@ -1,15 +1,15 @@
-const User = require('../models/User');
-const AppError = require('../../errors/AppError');
-const asyncHandler = require('../utils/asyncHandler');
-const { success } = require('../utils/apiResponse');
-const { uploadToImageKit, deleteFromImageKit } = require('../middlewares/upload.middleware');
+import User from '../models/User.js';
+import AppError from '../../errors/AppError.js';
+import asyncHandler from '../utils/asyncHandler.js';
+import { success } from '../utils/apiResponse.js';
+import { uploadToImageKit, deleteFromImageKit } from '../middlewares/upload.middleware.js';
 
-exports.getMe = asyncHandler(async (req, res) => {
+export const getMe = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user._id).populate('favoriteSalons', 'name averageRating location');
   success(res, 'Profile fetched', user);
 });
 
-exports.updateMe = asyncHandler(async (req, res) => {
+export const updateMe = asyncHandler(async (req, res) => {
   const { name, phone, fcmToken } = req.body;
   const updates = {};
   if (name) updates.name = name;
@@ -28,22 +28,20 @@ exports.updateMe = asyncHandler(async (req, res) => {
   success(res, 'Profile updated', user);
 });
 
-exports.deleteAccount = asyncHandler(async (req, res) => {
+export const deleteAccount = asyncHandler(async (req, res) => {
   await User.findByIdAndUpdate(req.user._id, { isDeleted: true, deletedAt: new Date() });
   success(res, 'Account deleted successfully');
 });
 
-exports.addAddress = asyncHandler(async (req, res) => {
+export const addAddress = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user._id);
-  if (req.body.isDefault) {
-    user.addresses.forEach((a) => (a.isDefault = false));
-  }
+  if (req.body.isDefault) user.addresses.forEach((a) => (a.isDefault = false));
   user.addresses.push(req.body);
   await user.save();
   success(res, 'Address added', user.addresses);
 });
 
-exports.updateAddress = asyncHandler(async (req, res) => {
+export const updateAddress = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user._id);
   const addr = user.addresses.id(req.params.addressId);
   if (!addr) throw new AppError('Address not found', 404);
@@ -53,14 +51,14 @@ exports.updateAddress = asyncHandler(async (req, res) => {
   success(res, 'Address updated', user.addresses);
 });
 
-exports.deleteAddress = asyncHandler(async (req, res) => {
+export const deleteAddress = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user._id);
   user.addresses = user.addresses.filter((a) => a._id.toString() !== req.params.addressId);
   await user.save();
   success(res, 'Address deleted', user.addresses);
 });
 
-exports.toggleFavoriteSalon = asyncHandler(async (req, res) => {
+export const toggleFavoriteSalon = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user._id);
   const salonId = req.params.salonId;
   const idx = user.favoriteSalons.findIndex((s) => s.toString() === salonId);
@@ -73,12 +71,12 @@ exports.toggleFavoriteSalon = asyncHandler(async (req, res) => {
   success(res, idx > -1 ? 'Removed from favorites' : 'Added to favorites');
 });
 
-exports.getFavorites = asyncHandler(async (req, res) => {
+export const getFavorites = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user._id).populate('favoriteSalons');
   success(res, 'Favorite salons fetched', user.favoriteSalons);
 });
 
-exports.changePassword = asyncHandler(async (req, res) => {
+export const changePassword = asyncHandler(async (req, res) => {
   const { oldPassword, newPassword } = req.body;
   const user = await User.findById(req.user._id).select('+passwordHash');
   if (!(await user.matchPassword(oldPassword))) throw new AppError('Incorrect current password', 400);

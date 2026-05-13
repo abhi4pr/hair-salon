@@ -1,4 +1,5 @@
-const AppError = require('./AppError');
+import AppError from './AppError.js';
+import logger from '../src/config/logger.js';
 
 const handleCastError = (err) => new AppError(`Invalid ${err.path}: ${err.value}`, 400);
 const handleDuplicateKey = (err) => {
@@ -24,8 +25,8 @@ const errorHandler = (err, req, res, next) => {
   const statusCode = error.statusCode || 500;
   const message = error.message || 'Internal Server Error';
 
-  if (process.env.NODE_ENV === 'development') {
-    console.error('[ERROR]', err);
+  if (!error.isOperational) {
+    logger.error(`[${req.method}] ${req.path} — ${err.stack || err.message}`);
   }
 
   res.status(statusCode).json({
@@ -35,4 +36,4 @@ const errorHandler = (err, req, res, next) => {
   });
 };
 
-module.exports = errorHandler;
+export default errorHandler;

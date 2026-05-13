@@ -1,6 +1,7 @@
-const admin = require('../config/firebase');
+import admin from '../config/firebase.js';
+import logger from '../config/logger.js';
 
-const sendPush = async ({ token, title, body, data = {} }) => {
+export const sendPush = async ({ token, title, body, data = {} }) => {
   if (!token) return;
   try {
     await admin.messaging().send({
@@ -10,11 +11,11 @@ const sendPush = async ({ token, title, body, data = {} }) => {
       android: { priority: 'high' },
     });
   } catch (err) {
-    console.error('[FCM Error]', err.message);
+    logger.warn(`[FCM] ${err.message}`);
   }
 };
 
-const sendPushToMany = async ({ tokens, title, body, data = {} }) => {
+export const sendPushToMany = async ({ tokens, title, body, data = {} }) => {
   const validTokens = tokens.filter(Boolean);
   if (!validTokens.length) return;
   try {
@@ -25,8 +26,6 @@ const sendPushToMany = async ({ tokens, title, body, data = {} }) => {
       android: { priority: 'high' },
     });
   } catch (err) {
-    console.error('[FCM Multicast Error]', err.message);
+    logger.warn(`[FCM Multicast] ${err.message}`);
   }
 };
-
-module.exports = { sendPush, sendPushToMany };

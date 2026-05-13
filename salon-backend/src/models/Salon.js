@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const businessHourSchema = new mongoose.Schema({
   day: { type: String, enum: ['monday','tuesday','wednesday','thursday','friday','saturday','sunday'], required: true },
@@ -52,4 +52,4 @@ const salonSchema = new mongoose.Schema(
 salonSchema.index({ 'location.coordinates': '2dsphere' });
 salonSchema.index({ name: 'text', description: 'text' });
 
-module.exports = mongoose.model('Salon', salonSchema);
+export default mongoose.model('Salon', salonSchema);

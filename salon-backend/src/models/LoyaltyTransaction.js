@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const loyaltyTransactionSchema = new mongoose.Schema(
   {
@@ -13,4 +13,4 @@ const loyaltyTransactionSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-module.exports = mongoose.model('LoyaltyTransaction', loyaltyTransactionSchema);
+export default mongoose.model('LoyaltyTransaction', loyaltyTransactionSchema);

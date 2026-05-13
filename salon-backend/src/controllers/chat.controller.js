@@ -1,26 +1,20 @@
-const ChatMessage = require('../models/ChatMessage');
-const SupportTicket = require('../models/SupportTicket');
-const Salon = require('../models/Salon');
-const AppError = require('../../errors/AppError');
-const asyncHandler = require('../utils/asyncHandler');
-const { success } = require('../utils/apiResponse');
-const paginate = require('../utils/paginate');
+import ChatMessage from '../models/ChatMessage.js';
+import SupportTicket from '../models/SupportTicket.js';
+import Salon from '../models/Salon.js';
+import AppError from '../../errors/AppError.js';
+import asyncHandler from '../utils/asyncHandler.js';
+import { success } from '../utils/apiResponse.js';
+import paginate from '../utils/paginate.js';
 
-exports.sendMessage = asyncHandler(async (req, res) => {
+export const sendMessage = asyncHandler(async (req, res) => {
   const { salonId, message } = req.body;
   const salon = await Salon.findById(salonId);
   if (!salon) throw new AppError('Salon not found', 404);
-
-  const msg = await ChatMessage.create({
-    salon: salonId,
-    customer: req.user._id,
-    senderRole: req.user.role,
-    message,
-  });
+  const msg = await ChatMessage.create({ salon: salonId, customer: req.user._id, senderRole: req.user.role, message });
   success(res, 'Message sent', msg, 201);
 });
 
-exports.getConversation = asyncHandler(async (req, res) => {
+export const getConversation = asyncHandler(async (req, res) => {
   const { salonId } = req.params;
   const { data, pagination } = await paginate(
     ChatMessage,
@@ -31,7 +25,7 @@ exports.getConversation = asyncHandler(async (req, res) => {
   success(res, 'Conversation fetched', data, 200, pagination);
 });
 
-exports.getSalonConversations = asyncHandler(async (req, res) => {
+export const getSalonConversations = asyncHandler(async (req, res) => {
   const salon = await Salon.findOne({ owner: req.user._id });
   if (!salon) throw new AppError('Salon not found', 404);
 
@@ -45,19 +39,19 @@ exports.getSalonConversations = asyncHandler(async (req, res) => {
   success(res, 'Conversations fetched', conversations);
 });
 
-exports.createTicket = asyncHandler(async (req, res) => {
+export const createTicket = asyncHandler(async (req, res) => {
   const ticket = await SupportTicket.create({ ...req.body, user: req.user._id });
   success(res, 'Support ticket created', ticket, 201);
 });
 
-exports.getMyTickets = asyncHandler(async (req, res) => {
+export const getMyTickets = asyncHandler(async (req, res) => {
   const { data, pagination } = await paginate(SupportTicket, { user: req.user._id }, {
-    page: req.query.page, limit: req.query.limit, sort: { createdAt: -1 }
+    page: req.query.page, limit: req.query.limit, sort: { createdAt: -1 },
   });
   success(res, 'Tickets fetched', data, 200, pagination);
 });
 
-exports.replyToTicket = asyncHandler(async (req, res) => {
+export const replyToTicket = asyncHandler(async (req, res) => {
   const ticket = await SupportTicket.findOne({ _id: req.params.id, user: req.user._id });
   if (!ticket) throw new AppError('Ticket not found', 404);
   ticket.replies.push({ senderRole: req.user.role, message: req.body.message });

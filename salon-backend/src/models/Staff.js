@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const workingHourSchema = new mongoose.Schema({
   day: { type: String, enum: ['monday','tuesday','wednesday','thursday','friday','saturday','sunday'] },
@@ -23,4 +23,4 @@ const staffSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-module.exports = mongoose.model('Staff', staffSchema);
+export default mongoose.model('Staff', staffSchema);

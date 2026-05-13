@@ -1,6 +1,6 @@
-const { body } = require('express-validator');
+import { body } from 'express-validator';
 
-const bookingValidator = [
+export const bookingValidator = [
   body('salonId').isMongoId().withMessage('Valid salon ID required'),
   body('services').isArray({ min: 1 }).withMessage('At least one service required'),
   body('services.*').isMongoId().withMessage('Invalid service ID'),
@@ -10,5 +10,3 @@ const bookingValidator = [
   body('staffId').optional().isMongoId(),
   body('couponCode').optional().isString(),
 ];
-
-module.exports = { bookingValidator };

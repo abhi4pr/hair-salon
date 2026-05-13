@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const replySchema = new mongoose.Schema({
   senderRole: { type: String, enum: ['customer', 'salon_owner', 'support'] },
@@ -20,4 +20,4 @@ const supportTicketSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-module.exports = mongoose.model('SupportTicket', supportTicketSchema);
+export default mongoose.model('SupportTicket', supportTicketSchema);

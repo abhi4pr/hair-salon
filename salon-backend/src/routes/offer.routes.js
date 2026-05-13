@@ -1,6 +1,8 @@
-const router = require('express').Router();
-const c = require('../controllers/offer.controller');
-const { verifyToken, requireRole } = require('../middlewares/auth.middleware');
+import { Router } from 'express';
+import * as c from '../controllers/offer.controller.js';
+import { verifyToken, requireRole } from '../middlewares/auth.middleware.js';
+
+const router = Router();
 
 router.get('/salon/:salonId', c.getSalonOffers);
 router.post('/validate', verifyToken, c.validateCoupon);
@@ -11,4 +13,4 @@ router.post('/', c.createOffer);
 router.patch('/:id', c.updateOffer);
 router.delete('/:id', c.deleteOffer);
 
-module.exports = router;
+export default router;

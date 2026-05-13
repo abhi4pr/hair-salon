@@ -1,9 +1,9 @@
-const Staff = require('../models/Staff');
-const Salon = require('../models/Salon');
-const AppError = require('../../errors/AppError');
-const asyncHandler = require('../utils/asyncHandler');
-const { success } = require('../utils/apiResponse');
-const { uploadToImageKit, deleteFromImageKit } = require('../middlewares/upload.middleware');
+import Staff from '../models/Staff.js';
+import Salon from '../models/Salon.js';
+import AppError from '../../errors/AppError.js';
+import asyncHandler from '../utils/asyncHandler.js';
+import { success } from '../utils/apiResponse.js';
+import { uploadToImageKit, deleteFromImageKit } from '../middlewares/upload.middleware.js';
 
 const getSalonForOwner = async (ownerId) => {
   const salon = await Salon.findOne({ owner: ownerId });
@@ -11,24 +11,24 @@ const getSalonForOwner = async (ownerId) => {
   return salon;
 };
 
-exports.createStaff = asyncHandler(async (req, res) => {
+export const createStaff = asyncHandler(async (req, res) => {
   const salon = await getSalonForOwner(req.user._id);
   const staff = await Staff.create({ ...req.body, salon: salon._id });
   success(res, 'Staff created', staff, 201);
 });
 
-exports.getStaff = asyncHandler(async (req, res) => {
+export const getStaff = asyncHandler(async (req, res) => {
   const salon = await getSalonForOwner(req.user._id);
   const staff = await Staff.find({ salon: salon._id }).populate('services', 'name duration price');
   success(res, 'Staff list fetched', staff);
 });
 
-exports.getStaffBySalon = asyncHandler(async (req, res) => {
+export const getStaffBySalon = asyncHandler(async (req, res) => {
   const staff = await Staff.find({ salon: req.params.salonId, isActive: true }).populate('services', 'name duration');
   success(res, 'Staff fetched', staff);
 });
 
-exports.updateStaff = asyncHandler(async (req, res) => {
+export const updateStaff = asyncHandler(async (req, res) => {
   const salon = await getSalonForOwner(req.user._id);
   const staff = await Staff.findOne({ _id: req.params.id, salon: salon._id });
   if (!staff) throw new AppError('Staff not found', 404);
@@ -45,7 +45,7 @@ exports.updateStaff = asyncHandler(async (req, res) => {
   success(res, 'Staff updated', staff);
 });
 
-exports.deleteStaff = asyncHandler(async (req, res) => {
+export const deleteStaff = asyncHandler(async (req, res) => {
   const salon = await getSalonForOwner(req.user._id);
   const staff = await Staff.findOne({ _id: req.params.id, salon: salon._id });
   if (!staff) throw new AppError('Staff not found', 404);

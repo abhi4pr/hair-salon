@@ -1,5 +1,5 @@
-const { validationResult } = require('express-validator');
-const { error } = require('../utils/apiResponse');
+import { validationResult } from 'express-validator';
+import { error } from '../utils/apiResponse.js';
 
 const validate = (req, res, next) => {
   const errors = validationResult(req);
@@ -9,4 +9,4 @@ const validate = (req, res, next) => {
   next();
 };
 
-module.exports = validate;
+export default validate;

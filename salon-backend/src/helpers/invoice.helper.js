@@ -1,8 +1,7 @@
-const PDFDocument = require('pdfkit');
-const path = require('path');
-const fs = require('fs');
+import PDFDocument from 'pdfkit';
+import fs from 'fs';
 
-const generateInvoicePDF = (appointment, outputPath) => {
+export const generateInvoicePDF = (appointment, outputPath) => {
   return new Promise((resolve, reject) => {
     const doc = new PDFDocument({ margin: 50 });
     const stream = fs.createWriteStream(outputPath);
@@ -37,5 +36,3 @@ const generateInvoicePDF = (appointment, outputPath) => {
     stream.on('error', reject);
   });
 };
-
-module.exports = { generateInvoicePDF };

@@ -1,12 +1,12 @@
-const Review = require('../models/Review');
-const Appointment = require('../models/Appointment');
-const Salon = require('../models/Salon');
-const Staff = require('../models/Staff');
-const AppError = require('../../errors/AppError');
-const asyncHandler = require('../utils/asyncHandler');
-const { success } = require('../utils/apiResponse');
-const paginate = require('../utils/paginate');
-const { uploadToImageKit } = require('../middlewares/upload.middleware');
+import Review from '../models/Review.js';
+import Appointment from '../models/Appointment.js';
+import Salon from '../models/Salon.js';
+import Staff from '../models/Staff.js';
+import AppError from '../../errors/AppError.js';
+import asyncHandler from '../utils/asyncHandler.js';
+import { success } from '../utils/apiResponse.js';
+import paginate from '../utils/paginate.js';
+import { uploadToImageKit } from '../middlewares/upload.middleware.js';
 
 const updateSalonRating = async (salonId) => {
   const reviews = await Review.find({ salon: salonId, isModerated: false });
@@ -20,9 +20,8 @@ const updateStaffRating = async (staffId) => {
   await Staff.findByIdAndUpdate(staffId, { averageRating: parseFloat(avg.toFixed(1)), totalReviews: reviews.length });
 };
 
-exports.createReview = asyncHandler(async (req, res) => {
+export const createReview = asyncHandler(async (req, res) => {
   const { appointmentId, salonRating, staffRating, serviceRating, comment } = req.body;
-
   const appt = await Appointment.findById(appointmentId);
   if (!appt) throw new AppError('Appointment not found', 404);
   if (appt.customer.toString() !== req.user._id.toString()) throw new AppError('Forbidden', 403);
@@ -38,15 +37,8 @@ exports.createReview = asyncHandler(async (req, res) => {
   }
 
   const review = await Review.create({
-    customer: req.user._id,
-    salon: appt.salon,
-    staff: appt.staff,
-    appointment: appointmentId,
-    salonRating,
-    staffRating,
-    serviceRating,
-    comment,
-    images,
+    customer: req.user._id, salon: appt.salon, staff: appt.staff,
+    appointment: appointmentId, salonRating, staffRating, serviceRating, comment, images,
   });
 
   await updateSalonRating(appt.salon);
@@ -55,7 +47,7 @@ exports.createReview = asyncHandler(async (req, res) => {
   success(res, 'Review submitted', review, 201);
 });
 
-exports.getSalonReviews = asyncHandler(async (req, res) => {
+export const getSalonReviews = asyncHandler(async (req, res) => {
   const { data, pagination } = await paginate(
     Review,
     { salon: req.params.salonId, isModerated: false },
@@ -64,19 +56,17 @@ exports.getSalonReviews = asyncHandler(async (req, res) => {
   success(res, 'Reviews fetched', data, 200, pagination);
 });
 
-exports.replyToReview = asyncHandler(async (req, res) => {
+export const replyToReview = asyncHandler(async (req, res) => {
   const salon = await Salon.findOne({ owner: req.user._id });
   if (!salon) throw new AppError('Salon not found', 404);
-
   const review = await Review.findOne({ _id: req.params.id, salon: salon._id });
   if (!review) throw new AppError('Review not found', 404);
-
   review.reply = { text: req.body.reply, repliedAt: new Date() };
   await review.save();
   success(res, 'Reply added', review);
 });
 
-exports.reportReview = asyncHandler(async (req, res) => {
+export const reportReview = asyncHandler(async (req, res) => {
   const review = await Review.findById(req.params.id);
   if (!review) throw new AppError('Review not found', 404);
   review.isReported = true;
@@ -85,7 +75,7 @@ exports.reportReview = asyncHandler(async (req, res) => {
   success(res, 'Review reported');
 });
 
-exports.moderateReview = asyncHandler(async (req, res) => {
+export const moderateReview = asyncHandler(async (req, res) => {
   const salon = await Salon.findOne({ owner: req.user._id });
   const review = await Review.findOne({ _id: req.params.id, salon: salon?._id });
   if (!review) throw new AppError('Review not found', 404);

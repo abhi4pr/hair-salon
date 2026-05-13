@@ -1,23 +1,23 @@
-const Offer = require('../models/Offer');
-const Salon = require('../models/Salon');
-const AppError = require('../../errors/AppError');
-const asyncHandler = require('../utils/asyncHandler');
-const { success } = require('../utils/apiResponse');
+import Offer from '../models/Offer.js';
+import Salon from '../models/Salon.js';
+import AppError from '../../errors/AppError.js';
+import asyncHandler from '../utils/asyncHandler.js';
+import { success } from '../utils/apiResponse.js';
 
-exports.createOffer = asyncHandler(async (req, res) => {
+export const createOffer = asyncHandler(async (req, res) => {
   const salon = await Salon.findOne({ owner: req.user._id });
   if (!salon) throw new AppError('Salon not found', 404);
   const offer = await Offer.create({ ...req.body, salon: salon._id });
   success(res, 'Offer created', offer, 201);
 });
 
-exports.getMyOffers = asyncHandler(async (req, res) => {
+export const getMyOffers = asyncHandler(async (req, res) => {
   const salon = await Salon.findOne({ owner: req.user._id });
   const offers = await Offer.find({ salon: salon?._id });
   success(res, 'Offers fetched', offers);
 });
 
-exports.getSalonOffers = asyncHandler(async (req, res) => {
+export const getSalonOffers = asyncHandler(async (req, res) => {
   const offers = await Offer.find({
     $or: [{ salon: req.params.salonId }, { salon: null }],
     isActive: true,
@@ -27,7 +27,7 @@ exports.getSalonOffers = asyncHandler(async (req, res) => {
   success(res, 'Offers fetched', offers);
 });
 
-exports.validateCoupon = asyncHandler(async (req, res) => {
+export const validateCoupon = asyncHandler(async (req, res) => {
   const { code, salonId, orderAmount } = req.body;
   const offer = await Offer.findOne({
     code: code.toUpperCase(),
@@ -36,7 +36,6 @@ exports.validateCoupon = asyncHandler(async (req, res) => {
     validTo: { $gte: new Date() },
     $or: [{ salon: salonId }, { salon: null }],
   });
-
   if (!offer) throw new AppError('Invalid or expired coupon', 400);
   if (offer.usageLimit && offer.usedCount >= offer.usageLimit) throw new AppError('Coupon usage limit reached', 400);
   if (parseFloat(orderAmount) < offer.minOrderValue) throw new AppError(`Min order ₹${offer.minOrderValue} required`, 400);
@@ -55,7 +54,7 @@ exports.validateCoupon = asyncHandler(async (req, res) => {
   success(res, 'Coupon valid', { offer: { code: offer.code, type: offer.type, value: offer.value }, discountAmount });
 });
 
-exports.updateOffer = asyncHandler(async (req, res) => {
+export const updateOffer = asyncHandler(async (req, res) => {
   const salon = await Salon.findOne({ owner: req.user._id });
   const offer = await Offer.findOne({ _id: req.params.id, salon: salon?._id });
   if (!offer) throw new AppError('Offer not found', 404);
@@ -64,7 +63,7 @@ exports.updateOffer = asyncHandler(async (req, res) => {
   success(res, 'Offer updated', offer);
 });
 
-exports.deleteOffer = asyncHandler(async (req, res) => {
+export const deleteOffer = asyncHandler(async (req, res) => {
   const salon = await Salon.findOne({ owner: req.user._id });
   const offer = await Offer.findOne({ _id: req.params.id, salon: salon?._id });
   if (!offer) throw new AppError('Offer not found', 404);

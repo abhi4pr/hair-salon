@@ -1,11 +1,12 @@
-const jwt = require('jsonwebtoken');
-const { v4: uuidv4 } = require('uuid');
-const User = require('../models/User');
-const AppError = require('../../errors/AppError');
-const asyncHandler = require('../utils/asyncHandler');
-const { success } = require('../utils/apiResponse');
-const { generateOTP, otpExpiryTime } = require('../helpers/otp.helper');
-const sendEmail = require('../utils/sendEmail');
+import jwt from 'jsonwebtoken';
+import { v4 as uuidv4 } from 'uuid';
+import User from '../models/User.js';
+import AppError from '../../errors/AppError.js';
+import asyncHandler from '../utils/asyncHandler.js';
+import { success } from '../utils/apiResponse.js';
+import { generateOTP, otpExpiryTime } from '../helpers/otp.helper.js';
+import sendEmail from '../utils/sendEmail.js';
+import logger from '../config/logger.js';
 
 const signToken = (id) =>
   jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRES_IN || '15m' });
@@ -19,7 +20,7 @@ const otpEmailHtml = (otp) => `
   <h1 style="letter-spacing:8px">${otp}</h1>
 `;
 
-exports.register = asyncHandler(async (req, res) => {
+export const register = asyncHandler(async (req, res) => {
   const { name, email, password, phone, role, referralCode } = req.body;
 
   const existing = await User.findOne({ email });
@@ -40,18 +41,14 @@ exports.register = asyncHandler(async (req, res) => {
     referredBy: referrer?._id || null,
   });
 
-  await sendEmail({
-    to: email,
-    subject: 'Verify your Salon App account',
-    html: otpEmailHtml(otp),
-  });
+  await sendEmail({ to: email, subject: 'Verify your Salon App account', html: otpEmailHtml(otp) });
+  logger.info(`New user registered: ${email}`);
 
   success(res, 'Registration successful. Please verify your email with the OTP sent.', { userId: user._id }, 201);
 });
 
-exports.verifyOTP = asyncHandler(async (req, res) => {
+export const verifyOTP = asyncHandler(async (req, res) => {
   const { email, otp } = req.body;
-
   const user = await User.findOne({ email }).select('+otp +otpExpiry');
   if (!user) throw new AppError('User not found', 404);
   if (user.isVerified) throw new AppError('Account already verified', 400);
@@ -66,9 +63,8 @@ exports.verifyOTP = asyncHandler(async (req, res) => {
   success(res, 'Email verified successfully');
 });
 
-exports.resendOTP = asyncHandler(async (req, res) => {
+export const resendOTP = asyncHandler(async (req, res) => {
   const { email } = req.body;
-
   const user = await User.findOne({ email }).select('+otp +otpExpiry');
   if (!user) throw new AppError('User not found', 404);
   if (user.isVerified) throw new AppError('Account already verified', 400);
@@ -79,25 +75,21 @@ exports.resendOTP = asyncHandler(async (req, res) => {
   await user.save();
 
   await sendEmail({ to: email, subject: 'Your new OTP', html: otpEmailHtml(otp) });
-
   success(res, 'OTP resent to your email');
 });
 
-exports.login = asyncHandler(async (req, res) => {
+export const login = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
-
   const user = await User.findOne({ email, isDeleted: false }).select('+passwordHash +refreshToken');
-  if (!user || !(await user.matchPassword(password))) {
-    throw new AppError('Invalid email or password', 401);
-  }
+  if (!user || !(await user.matchPassword(password))) throw new AppError('Invalid email or password', 401);
   if (!user.isVerified) throw new AppError('Please verify your email first', 403);
 
   const accessToken = signToken(user._id);
   const refreshToken = signRefreshToken(user._id);
-
   user.refreshToken = refreshToken;
   await user.save();
 
+  logger.info(`User logged in: ${email}`);
   success(res, 'Login successful', {
     accessToken,
     refreshToken,
@@ -105,7 +97,7 @@ exports.login = asyncHandler(async (req, res) => {
   });
 });
 
-exports.refreshToken = asyncHandler(async (req, res) => {
+export const refreshToken = asyncHandler(async (req, res) => {
   const { refreshToken } = req.body;
   if (!refreshToken) throw new AppError('Refresh token required', 401);
 
@@ -113,11 +105,10 @@ exports.refreshToken = asyncHandler(async (req, res) => {
   const user = await User.findById(decoded.id).select('+refreshToken');
   if (!user || user.refreshToken !== refreshToken) throw new AppError('Invalid refresh token', 401);
 
-  const accessToken = signToken(user._id);
-  success(res, 'Token refreshed', { accessToken });
+  success(res, 'Token refreshed', { accessToken: signToken(user._id) });
 });
 
-exports.forgotPassword = asyncHandler(async (req, res) => {
+export const forgotPassword = asyncHandler(async (req, res) => {
   const { email } = req.body;
   const user = await User.findOne({ email }).select('+otp +otpExpiry');
   if (!user) throw new AppError('No account found with this email', 404);
@@ -127,16 +118,11 @@ exports.forgotPassword = asyncHandler(async (req, res) => {
   user.otpExpiry = otpExpiryTime();
   await user.save();
 
-  await sendEmail({
-    to: email,
-    subject: 'Reset your password',
-    html: `<h2>Password Reset OTP</h2>${otpEmailHtml(otp)}`,
-  });
-
+  await sendEmail({ to: email, subject: 'Reset your password', html: `<h2>Password Reset OTP</h2>${otpEmailHtml(otp)}` });
   success(res, 'OTP sent to your email for password reset');
 });
 
-exports.resetPassword = asyncHandler(async (req, res) => {
+export const resetPassword = asyncHandler(async (req, res) => {
   const { email, otp, newPassword } = req.body;
   const user = await User.findOne({ email }).select('+otp +otpExpiry +passwordHash');
   if (!user) throw new AppError('User not found', 404);
@@ -151,7 +137,7 @@ exports.resetPassword = asyncHandler(async (req, res) => {
   success(res, 'Password reset successful');
 });
 
-exports.logout = asyncHandler(async (req, res) => {
+export const logout = asyncHandler(async (req, res) => {
   await User.findByIdAndUpdate(req.user._id, { refreshToken: null });
   success(res, 'Logged out successfully');
 });

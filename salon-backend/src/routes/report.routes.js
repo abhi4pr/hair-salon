@@ -1,7 +1,8 @@
-const router = require('express').Router();
-const c = require('../controllers/report.controller');
-const { verifyToken, requireRole } = require('../middlewares/auth.middleware');
+import { Router } from 'express';
+import * as c from '../controllers/report.controller.js';
+import { verifyToken, requireRole } from '../middlewares/auth.middleware.js';
 
+const router = Router();
 router.use(verifyToken, requireRole('salon_owner'));
 
 router.get('/revenue', c.getRevenueReport);
@@ -12,4 +13,4 @@ router.get('/services', c.getServicePopularity);
 router.get('/cancellations', c.getCancellationReport);
 router.get('/tax', c.getTaxReport);
 
-module.exports = router;
+export default router;

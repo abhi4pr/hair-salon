@@ -1,31 +1,29 @@
-const User = require('../models/User');
-const LoyaltyTransaction = require('../models/LoyaltyTransaction');
-const { MembershipPlan, UserMembership } = require('../models/Membership');
-const AppError = require('../../errors/AppError');
-const asyncHandler = require('../utils/asyncHandler');
-const { success } = require('../utils/apiResponse');
-const paginate = require('../utils/paginate');
+import User from '../models/User.js';
+import LoyaltyTransaction from '../models/LoyaltyTransaction.js';
+import { MembershipPlan, UserMembership } from '../models/Membership.js';
+import AppError from '../../errors/AppError.js';
+import asyncHandler from '../utils/asyncHandler.js';
+import { success } from '../utils/apiResponse.js';
+import paginate from '../utils/paginate.js';
 
-exports.getMyLoyaltyBalance = asyncHandler(async (req, res) => {
+export const getMyLoyaltyBalance = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user._id).select('loyaltyPoints walletBalance referralCode');
   success(res, 'Loyalty info fetched', user);
 });
 
-exports.getLoyaltyHistory = asyncHandler(async (req, res) => {
+export const getLoyaltyHistory = asyncHandler(async (req, res) => {
   const { data, pagination } = await paginate(LoyaltyTransaction, { user: req.user._id }, {
-    page: req.query.page,
-    limit: req.query.limit,
-    sort: { createdAt: -1 },
+    page: req.query.page, limit: req.query.limit, sort: { createdAt: -1 },
   });
   success(res, 'Loyalty history fetched', data, 200, pagination);
 });
 
-exports.getMembershipPlans = asyncHandler(async (req, res) => {
+export const getMembershipPlans = asyncHandler(async (req, res) => {
   const plans = await MembershipPlan.find({ isActive: true, $or: [{ salon: req.params.salonId || null }, { salon: null }] });
   success(res, 'Plans fetched', plans);
 });
 
-exports.purchaseMembership = asyncHandler(async (req, res) => {
+export const purchaseMembership = asyncHandler(async (req, res) => {
   const plan = await MembershipPlan.findById(req.body.planId);
   if (!plan || !plan.isActive) throw new AppError('Plan not found', 404);
 
@@ -37,24 +35,19 @@ exports.purchaseMembership = asyncHandler(async (req, res) => {
   endDate.setDate(endDate.getDate() + plan.durationDays);
 
   const membership = await UserMembership.create({
-    user: req.user._id,
-    plan: plan._id,
-    salon: req.body.salonId || null,
-    startDate,
-    endDate,
-    amountPaid: plan.price,
-    paymentMethod: req.body.paymentMethod || 'cash',
+    user: req.user._id, plan: plan._id, salon: req.body.salonId || null,
+    startDate, endDate, amountPaid: plan.price, paymentMethod: req.body.paymentMethod || 'cash',
   });
 
   success(res, 'Membership purchased', membership, 201);
 });
 
-exports.getMyMemberships = asyncHandler(async (req, res) => {
+export const getMyMemberships = asyncHandler(async (req, res) => {
   const memberships = await UserMembership.find({ user: req.user._id }).populate('plan');
   success(res, 'Memberships fetched', memberships);
 });
 
-exports.createMembershipPlan = asyncHandler(async (req, res) => {
+export const createMembershipPlan = asyncHandler(async (req, res) => {
   const plan = await MembershipPlan.create(req.body);
   success(res, 'Plan created', plan, 201);
 });

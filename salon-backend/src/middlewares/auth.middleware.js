@@ -1,13 +1,11 @@
-const jwt = require('jsonwebtoken');
-const AppError = require('../../errors/AppError');
-const asyncHandler = require('../utils/asyncHandler');
-const User = require('../models/User');
+import jwt from 'jsonwebtoken';
+import AppError from '../../errors/AppError.js';
+import asyncHandler from '../utils/asyncHandler.js';
+import User from '../models/User.js';
 
-const verifyToken = asyncHandler(async (req, res, next) => {
+export const verifyToken = asyncHandler(async (req, res, next) => {
   const authHeader = req.headers.authorization;
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    throw new AppError('No token provided', 401);
-  }
+  if (!authHeader?.startsWith('Bearer ')) throw new AppError('No token provided', 401);
 
   const token = authHeader.split(' ')[1];
   const decoded = jwt.verify(token, process.env.JWT_SECRET);
@@ -19,11 +17,9 @@ const verifyToken = asyncHandler(async (req, res, next) => {
   next();
 });
 
-const requireRole = (...roles) => (req, res, next) => {
+export const requireRole = (...roles) => (req, res, next) => {
   if (!roles.includes(req.user.role)) {
     return next(new AppError('Forbidden: insufficient permissions', 403));
   }
   next();
 };
-
-module.exports = { verifyToken, requireRole };

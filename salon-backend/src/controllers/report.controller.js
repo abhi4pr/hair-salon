@@ -1,10 +1,9 @@
-const moment = require('moment');
-const Appointment = require('../models/Appointment');
-const Salon = require('../models/Salon');
-const Review = require('../models/Review');
-const AppError = require('../../errors/AppError');
-const asyncHandler = require('../utils/asyncHandler');
-const { success } = require('../utils/apiResponse');
+import moment from 'moment';
+import Appointment from '../models/Appointment.js';
+import Salon from '../models/Salon.js';
+import AppError from '../../errors/AppError.js';
+import asyncHandler from '../utils/asyncHandler.js';
+import { success } from '../utils/apiResponse.js';
 
 const getSalonForOwner = async (ownerId) => {
   const salon = await Salon.findOne({ owner: ownerId });
@@ -12,15 +11,14 @@ const getSalonForOwner = async (ownerId) => {
   return salon;
 };
 
-exports.getRevenueReport = asyncHandler(async (req, res) => {
+export const getRevenueReport = asyncHandler(async (req, res) => {
   const salon = await getSalonForOwner(req.user._id);
   const { period = 'monthly', year = new Date().getFullYear(), month } = req.query;
 
-  let match = { salon: salon._id, status: 'completed', paymentStatus: 'paid' };
+  const match = { salon: salon._id, status: 'completed', paymentStatus: 'paid' };
   if (period === 'daily' && month) {
     const start = moment(`${year}-${month}-01`).startOf('month');
-    const end = moment(start).endOf('month');
-    match.date = { $gte: start.toDate(), $lte: end.toDate() };
+    match.date = { $gte: start.toDate(), $lte: moment(start).endOf('month').toDate() };
   } else {
     match.date = { $gte: new Date(`${year}-01-01`), $lte: new Date(`${year}-12-31`) };
   }
@@ -31,14 +29,12 @@ exports.getRevenueReport = asyncHandler(async (req, res) => {
     { $group: { _id: groupBy, revenue: { $sum: '$totalAmount' }, bookings: { $sum: 1 }, tips: { $sum: '$tipAmount' } } },
     { $sort: { _id: 1 } },
   ]);
-
   success(res, 'Revenue report', report);
 });
 
-exports.getBookingStats = asyncHandler(async (req, res) => {
+export const getBookingStats = asyncHandler(async (req, res) => {
   const salon = await getSalonForOwner(req.user._id);
   const { startDate, endDate } = req.query;
-
   const match = { salon: salon._id };
   if (startDate && endDate) match.date = { $gte: new Date(startDate), $lte: new Date(endDate) };
 
@@ -53,11 +49,10 @@ exports.getBookingStats = asyncHandler(async (req, res) => {
       totalRevenue: { $sum: { $cond: [{ $eq: ['$status', 'completed'] }, '$totalAmount', 0] } },
     }},
   ]);
-
   success(res, 'Booking stats', stats || {});
 });
 
-exports.getPeakHours = asyncHandler(async (req, res) => {
+export const getPeakHours = asyncHandler(async (req, res) => {
   const salon = await getSalonForOwner(req.user._id);
   const report = await Appointment.aggregate([
     { $match: { salon: salon._id, status: { $in: ['completed', 'confirmed'] } } },
@@ -67,7 +62,7 @@ exports.getPeakHours = asyncHandler(async (req, res) => {
   success(res, 'Peak hours', report);
 });
 
-exports.getStaffPerformance = asyncHandler(async (req, res) => {
+export const getStaffPerformance = asyncHandler(async (req, res) => {
   const salon = await getSalonForOwner(req.user._id);
   const report = await Appointment.aggregate([
     { $match: { salon: salon._id, staff: { $ne: null }, status: 'completed' } },
@@ -79,7 +74,7 @@ exports.getStaffPerformance = asyncHandler(async (req, res) => {
   success(res, 'Staff performance', report);
 });
 
-exports.getServicePopularity = asyncHandler(async (req, res) => {
+export const getServicePopularity = asyncHandler(async (req, res) => {
   const salon = await getSalonForOwner(req.user._id);
   const report = await Appointment.aggregate([
     { $match: { salon: salon._id, status: 'completed' } },
@@ -93,7 +88,7 @@ exports.getServicePopularity = asyncHandler(async (req, res) => {
   success(res, 'Service popularity', report);
 });
 
-exports.getCancellationReport = asyncHandler(async (req, res) => {
+export const getCancellationReport = asyncHandler(async (req, res) => {
   const salon = await getSalonForOwner(req.user._id);
   const report = await Appointment.aggregate([
     { $match: { salon: salon._id, status: 'cancelled' } },
@@ -102,7 +97,7 @@ exports.getCancellationReport = asyncHandler(async (req, res) => {
   success(res, 'Cancellation report', report);
 });
 
-exports.getTaxReport = asyncHandler(async (req, res) => {
+export const getTaxReport = asyncHandler(async (req, res) => {
   const salon = await getSalonForOwner(req.user._id);
   const { month, year } = req.query;
   const start = moment(`${year}-${month}-01`).startOf('month');

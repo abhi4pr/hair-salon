@@ -1,7 +1,8 @@
-const router = require('express').Router();
-const c = require('../controllers/chat.controller');
-const { verifyToken, requireRole } = require('../middlewares/auth.middleware');
+import { Router } from 'express';
+import * as c from '../controllers/chat.controller.js';
+import { verifyToken, requireRole } from '../middlewares/auth.middleware.js';
 
+const router = Router();
 router.use(verifyToken);
 
 router.post('/messages', c.sendMessage);
@@ -12,4 +13,4 @@ router.post('/tickets', c.createTicket);
 router.get('/tickets', c.getMyTickets);
 router.post('/tickets/:id/reply', c.replyToTicket);
 
-module.exports = router;
+export default router;

@@ -1,9 +1,11 @@
-const router = require('express').Router();
-const c = require('../controllers/review.controller');
-const { verifyToken, requireRole } = require('../middlewares/auth.middleware');
-const { upload } = require('../middlewares/upload.middleware');
-const { reviewValidator } = require('../validators/review.validator');
-const validate = require('../middlewares/validate.middleware');
+import { Router } from 'express';
+import * as c from '../controllers/review.controller.js';
+import { verifyToken, requireRole } from '../middlewares/auth.middleware.js';
+import { upload } from '../middlewares/upload.middleware.js';
+import { reviewValidator } from '../validators/review.validator.js';
+import validate from '../middlewares/validate.middleware.js';
+
+const router = Router();
 
 router.get('/salon/:salonId', c.getSalonReviews);
 
@@ -13,4 +15,4 @@ router.post('/:id/report', c.reportReview);
 router.post('/:id/reply', requireRole('salon_owner'), c.replyToReview);
 router.patch('/:id/moderate', requireRole('salon_owner'), c.moderateReview);
 
-module.exports = router;
+export default router;
