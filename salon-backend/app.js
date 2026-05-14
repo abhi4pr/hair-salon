@@ -30,7 +30,7 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(globalLimiter);
 app.use(morganMiddleware);
 
-app.get('/health', (req, res) => res.json({ success: true, message: 'Server is running' }));
+app.get('/api/health', (req, res) => res.json({ success: true, message: 'Server is running' }));
 
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
@@ -46,7 +46,7 @@ app.use('/api/notifications', notificationRoutes);
 app.use('/api/chat', chatRoutes);
 app.use('/api/reports', reportRoutes);
 
-app.all('*', (req, res, next) => next(new AppError(`Route ${req.originalUrl} not found`, 404)));
+app.all('/{*splat}', (req, res, next) => next(new AppError(`Route ${req.originalUrl} not found`, 404)));
 
 app.use(errorHandler);
 

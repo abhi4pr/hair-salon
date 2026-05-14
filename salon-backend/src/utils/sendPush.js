@@ -2,7 +2,7 @@ import admin from '../config/firebase.js';
 import logger from '../config/logger.js';
 
 export const sendPush = async ({ token, title, body, data = {} }) => {
-  if (!token) return;
+  if (!token || !admin.apps.length) return;
   try {
     await admin.messaging().send({
       token,
@@ -17,7 +17,7 @@ export const sendPush = async ({ token, title, body, data = {} }) => {
 
 export const sendPushToMany = async ({ tokens, title, body, data = {} }) => {
   const validTokens = tokens.filter(Boolean);
-  if (!validTokens.length) return;
+  if (!validTokens.length || !admin.apps.length) return;
   try {
     await admin.messaging().sendEachForMulticast({
       tokens: validTokens,
