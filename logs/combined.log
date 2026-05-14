@@ -1,0 +1,14 @@
+[2026-05-14 14:33:56] info: MongoDB connected: cluster0-shard-00-00.j1gtc.mongodb.net
+[2026-05-14 14:33:56] info: Server running on port 5000 in development mode
+[2026-05-14 14:34:44] info: MongoDB connected: cluster0-shard-00-00.j1gtc.mongodb.net
+[2026-05-14 14:34:44] info: Server running on port 5000 in development mode
+[2026-05-14 14:34:46] http: GET /api/health 404 1029 - 5.691 ms
+[2026-05-14 14:34:46] http: GET /favicon.ico 404 1031 - 1.889 ms
+[2026-05-14 14:34:51] http: GET //health 404 1023 - 2.848 ms
+[2026-05-14 14:36:53] info: MongoDB connected: cluster0-shard-00-00.j1gtc.mongodb.net
+[2026-05-14 14:36:53] info: Server running on port 5000 in development mode
+[2026-05-14 14:37:07] http: GET /api/health 200 46 - 2.699 ms
+[2026-05-14 15:24:08] info: MongoDB connected: cluster0-shard-00-00.j1gtc.mongodb.net
+[2026-05-14 15:24:08] info: Server running on port 5000 in development mode
+[2026-05-14 15:24:27] info: New user registered: hello@gmail.com
+[2026-05-14 15:24:27] http: POST /api/auth/register 201 142 - 3460.894 ms
