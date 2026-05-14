@@ -152,12 +152,6 @@ export default function Register() {
               },
             ]}
           >
-            <Ionicons
-              name="chevron-down-outline"
-              size={16}
-              color={theme.textSecondary}
-              style={styles.pickerIcon}
-            />
             <Picker
               selectedValue={form.role}
               onValueChange={(v) => set("role", v)}

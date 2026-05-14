@@ -12,3 +12,10 @@
 [2026-05-14 15:24:08] info: Server running on port 5000 in development mode
 [2026-05-14 15:24:27] info: New user registered: hello@gmail.com
 [2026-05-14 15:24:27] http: POST /api/auth/register 201 142 - 3460.894 ms
+[2026-05-14 15:42:49] info: MongoDB connected: cluster0-shard-00-00.j1gtc.mongodb.net
+[2026-05-14 15:42:49] info: Server running on port 5000 in development mode
+[2026-05-14 15:42:54] http: POST /api/auth/register 409 274 - 57.573 ms
+[2026-05-14 16:13:43] info: MongoDB connected: cluster0-shard-00-00.j1gtc.mongodb.net
+[2026-05-14 16:13:43] info: Server running on port 5000 in development mode
+[2026-05-14 16:13:59] info: New user registered: demo@yopmail.com
+[2026-05-14 16:13:59] http: POST /api/auth/register 201 142 - 3577.505 ms
