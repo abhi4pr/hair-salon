@@ -19,11 +19,6 @@ import { COLORS, FONT_SIZE, RADIUS, SPACING } from "../../src/theme/colors";
 
 const MENU_ITEMS = [
   { key: "yourProfile", icon: "person-outline", route: "/profile/edit" },
-  {
-    key: "paymentMethods",
-    icon: "card-outline",
-    route: "/profile/payment-methods",
-  },
   { key: "saved", icon: "heart-outline", route: "/profile/favorites" },
   {
     key: "loyaltyPointsTitle",
@@ -45,7 +40,7 @@ const MENU_ITEMS = [
 ];
 
 export default function Profile() {
-  const { theme, isDark, toggleTheme } = useTheme();
+  const { theme } = useTheme();
   const { t } = useLanguage();
   const router = useRouter();
   const insets = useSafeAreaInsets();
@@ -190,48 +185,6 @@ export default function Profile() {
           ))}
         </View>
 
-        {/* Theme Toggle */}
-        <View
-          style={[
-            styles.menuCard,
-            {
-              backgroundColor: theme.card,
-              shadowColor: theme.shadow,
-              marginTop: SPACING.sm,
-            },
-          ]}
-        >
-          <TouchableOpacity
-            style={styles.menuItem}
-            onPress={toggleTheme}
-            activeOpacity={0.7}
-          >
-            <View style={[styles.menuIcon, { backgroundColor: theme.surface }]}>
-              <Ionicons
-                name={isDark ? "sunny-outline" : "moon-outline"}
-                size={18}
-                color={COLORS.primary}
-              />
-            </View>
-            <Text style={[styles.menuLabel, { color: theme.textPrimary }]}>
-              {t("darkMode")}
-            </Text>
-            <View
-              style={[
-                styles.toggle,
-                { backgroundColor: isDark ? COLORS.primary : theme.border },
-              ]}
-            >
-              <View
-                style={[
-                  styles.toggleKnob,
-                  { transform: [{ translateX: isDark ? 20 : 2 }] },
-                ]}
-              />
-            </View>
-          </TouchableOpacity>
-        </View>
-
         {/* Logout */}
         <TouchableOpacity
           style={[
@@ -340,13 +293,6 @@ const styles = StyleSheet.create({
     marginRight: SPACING.md,
   },
   menuLabel: { flex: 1, fontSize: FONT_SIZE.md, fontWeight: "500" },
-  toggle: { width: 44, height: 24, borderRadius: 12, justifyContent: "center" },
-  toggleKnob: {
-    width: 20,
-    height: 20,
-    borderRadius: 10,
-    backgroundColor: "#FFF",
-  },
   logoutBtn: {
     flexDirection: "row",
     alignItems: "center",

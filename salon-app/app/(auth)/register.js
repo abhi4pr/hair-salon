@@ -90,7 +90,7 @@ export default function Register() {
       <ScrollView
         contentContainerStyle={[
           styles.scroll,
-          { paddingTop: insets.top + SPACING.md },
+          { paddingTop: insets.top + SPACING.xl },
         ]}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"

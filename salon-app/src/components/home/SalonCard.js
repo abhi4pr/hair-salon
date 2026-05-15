@@ -50,19 +50,17 @@ export default function SalonCard({ salon, onFavoriteToggle, isFavorite, compact
         <Text style={[styles.services, { color: theme.textSecondary }]} numberOfLines={1}>
           {salon.services?.slice(0, 3).map(s => s.name || s).join(', ')}
         </Text>
-        {!compact && (
-          <View style={styles.metaRow}>
-            <Ionicons name="location-outline" size={12} color={COLORS.primary} />
-            <Text style={[styles.meta, { color: theme.textSecondary }]} numberOfLines={1}>
-              {salon.location?.address || salon.location?.city}
+        <View style={styles.metaRow}>
+          <Ionicons name="location-outline" size={12} color={COLORS.primary} />
+          <Text style={[styles.meta, { color: theme.textSecondary }]} numberOfLines={1}>
+            {salon.location?.address || salon.location?.city}
+          </Text>
+          {!compact && salon.distance != null && (
+            <Text style={[styles.dist, { color: theme.textSecondary }]}>
+              · {salon.distance < 1 ? `${Math.round(salon.distance * 1000)}m` : `${salon.distance.toFixed(1)}km`}
             </Text>
-            {salon.distance != null && (
-              <Text style={[styles.dist, { color: theme.textSecondary }]}>
-                · {salon.distance < 1 ? `${Math.round(salon.distance * 1000)}m` : `${salon.distance.toFixed(1)}km`}
-              </Text>
-            )}
-          </View>
-        )}
+          )}
+        </View>
       </View>
     </TouchableOpacity>
   );

@@ -124,7 +124,7 @@ export default function Explore() {
         ListEmptyComponent={!loading ? (
           <EmptyState icon="search-outline" title={t('noResults')} subtitle="Try different keywords or filters" />
         ) : null}
-        contentContainerStyle={{ flexGrow: 1 }}
+        contentContainerStyle={{ flexGrow: 1, paddingTop: SPACING.sm }}
       />
 
       {/* Filter Modal */}

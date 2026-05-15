@@ -78,7 +78,7 @@ export default function Bookings() {
   const renderBooking = ({ item }) => (
     <TouchableOpacity
       style={[styles.card, { backgroundColor: theme.card, shadowColor: theme.shadow }]}
-      onPress={() => router.push(`/booking/detail/${item._id}`)}
+      onPress={() => {}}
       activeOpacity={0.9}
     >
       <View style={styles.cardTop}>
@@ -156,9 +156,6 @@ export default function Bookings() {
     <View style={[styles.container, { backgroundColor: theme.background, paddingTop: insets.top }]}>
       <View style={[styles.header, { borderBottomColor: theme.border }]}>
         <Text style={[styles.headerTitle, { color: theme.textPrimary }]}>{t('bookings')}</Text>
-        <TouchableOpacity>
-          <Ionicons name="search-outline" size={22} color={theme.textPrimary} />
-        </TouchableOpacity>
       </View>
 
       {/* Tabs */}

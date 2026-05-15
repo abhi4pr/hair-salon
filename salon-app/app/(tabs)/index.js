@@ -68,10 +68,6 @@ export default function Home() {
     <View style={[styles.container, { backgroundColor: theme.background }]}>
       {/* Header */}
       <View style={[styles.header, { paddingTop: insets.top + SPACING.sm, backgroundColor: theme.background }]}>
-        <View style={styles.locationRow}>
-          <Ionicons name="location" size={16} color={COLORS.primary} />
-          <Text style={[styles.locationLabel, { color: theme.textSecondary }]}>{t('location')}</Text>
-        </View>
         <View style={styles.headerRow}>
           <TouchableOpacity style={styles.locationBtn}>
             <Text style={[styles.locationText, { color: theme.textPrimary }]} numberOfLines={1}>
@@ -81,7 +77,7 @@ export default function Home() {
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles.notifBtn, { backgroundColor: theme.surface }]}
-            onPress={() => router.push('/notifications')}
+            onPress={() => {}}
           >
             <Ionicons name="notifications-outline" size={20} color={theme.textPrimary} />
           </TouchableOpacity>
@@ -160,8 +156,6 @@ function SectionHeader({ title, onSeeAll, t, theme }) {
 const styles = StyleSheet.create({
   container: { flex: 1 },
   header: { paddingHorizontal: SPACING.md, paddingBottom: SPACING.sm },
-  locationRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 2 },
-  locationLabel: { fontSize: FONT_SIZE.xs, marginLeft: 4 },
   headerRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   locationBtn: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   locationText: { fontSize: FONT_SIZE.lg, fontWeight: '700' },

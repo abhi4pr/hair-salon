@@ -43,9 +43,10 @@ function AppContent() {
         <Stack.Screen name="profile/settings" />
         <Stack.Screen name="profile/change-password" />
         <Stack.Screen name="help/index" />
+        <Stack.Screen name="help/privacy" />
         <Stack.Screen name="chat/[id]" />
       </Stack>
-      <Toast position="bottom" bottomOffset={40} />
+      <Toast position="bottom" bottomOffset={70} />
     </>
   );
 }
