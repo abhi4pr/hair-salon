@@ -59,13 +59,13 @@ export const verifyOTP = asyncHandler(async (req, res) => {
   user.otp = undefined;
   user.otpExpiry = undefined;
 
-  const accessToken = signToken(user._id);
+  const token = signToken(user._id);
   const refreshToken = signRefreshToken(user._id);
   user.refreshToken = refreshToken;
   await user.save();
 
   success(res, 'Email verified successfully', {
-    token: accessToken,
+    token,
     refreshToken,
     user: { _id: user._id, name: user.name, email: user.email, role: user.role, avatar: user.avatar },
   });
@@ -92,14 +92,14 @@ export const login = asyncHandler(async (req, res) => {
   if (!user || !(await user.matchPassword(password))) throw new AppError('Invalid email or password', 401);
   if (!user.isVerified) throw new AppError('Please verify your email first', 403);
 
-  const accessToken = signToken(user._id);
+  const token = signToken(user._id);
   const refreshToken = signRefreshToken(user._id);
   user.refreshToken = refreshToken;
   await user.save();
 
   logger.info(`User logged in: ${email}`);
   success(res, 'Login successful', {
-    accessToken,
+    token,
     refreshToken,
     user: { _id: user._id, name: user.name, email: user.email, role: user.role, avatar: user.avatar },
   });
@@ -113,7 +113,7 @@ export const refreshToken = asyncHandler(async (req, res) => {
   const user = await User.findById(decoded.id).select('+refreshToken');
   if (!user || user.refreshToken !== refreshToken) throw new AppError('Invalid refresh token', 401);
 
-  success(res, 'Token refreshed', { accessToken: signToken(user._id) });
+  success(res, 'Token refreshed', { token: signToken(user._id) });
 });
 
 export const forgotPassword = asyncHandler(async (req, res) => {

@@ -34,6 +34,9 @@ const userSchema = new mongoose.Schema(
     referralCode: { type: String, unique: true, sparse: true },
     referredBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
 
+    dob: { type: String, default: '' },
+    gender: { type: String, enum: ['Male', 'Female', 'Other', ''], default: '' },
+
     fcmToken: { type: String },
     refreshToken: { type: String, select: false },
 

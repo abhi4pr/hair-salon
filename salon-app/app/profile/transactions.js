@@ -27,28 +27,33 @@ export default function Transactions() {
       <FlatList
         data={transactions}
         keyExtractor={(_, i) => i.toString()}
-        renderItem={({ item }) => (
-          <View style={[styles.item, { backgroundColor: theme.card, shadowColor: theme.shadow }]}>
-            <View style={[styles.iconWrap, { backgroundColor: item.status === 'completed' ? '#E8FAF0' : '#FFF0F0' }]}>
-              <Ionicons name={item.status === 'completed' ? 'checkmark-circle-outline' : 'close-circle-outline'} size={24} color={item.status === 'completed' ? '#22C55E' : theme.error} />
-            </View>
-            <View style={styles.info}>
-              <Text style={[styles.salonName, { color: theme.textPrimary }]}>{item.salon?.name || 'Salon'}</Text>
-              <Text style={[styles.date, { color: theme.textSecondary }]}>
-                {new Date(item.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
-              </Text>
-              <Text style={[styles.method, { color: theme.textSecondary }]}>{item.method || 'Cash'}</Text>
-            </View>
-            <View style={styles.amountWrap}>
-              <Text style={[styles.amount, { color: item.status === 'completed' ? theme.textPrimary : theme.error }]}>₹{item.amount}</Text>
-              <View style={[styles.statusBadge, { backgroundColor: item.status === 'completed' ? '#E8FAF0' : '#FFF0F0' }]}>
-                <Text style={[styles.statusText, { color: item.status === 'completed' ? '#22C55E' : theme.error }]}>
-                  {item.status}
+        renderItem={({ item }) => {
+          const isPaid = item.paymentStatus === 'paid';
+          return (
+            <View style={[styles.item, { backgroundColor: theme.card, shadowColor: theme.shadow }]}>
+              <View style={[styles.iconWrap, { backgroundColor: isPaid ? '#E8FAF0' : '#FFF0F0' }]}>
+                <Ionicons name={isPaid ? 'checkmark-circle-outline' : 'close-circle-outline'} size={24} color={isPaid ? '#22C55E' : theme.error} />
+              </View>
+              <View style={styles.info}>
+                <Text style={[styles.salonName, { color: theme.textPrimary }]}>{item.salon?.name || 'Salon'}</Text>
+                <Text style={[styles.date, { color: theme.textSecondary }]}>
+                  {new Date(item.date || item.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
+                </Text>
+                <Text style={[styles.method, { color: theme.textSecondary }]}>
+                  {item.paymentMethod ? item.paymentMethod.charAt(0).toUpperCase() + item.paymentMethod.slice(1) : 'Cash'}
                 </Text>
               </View>
+              <View style={styles.amountWrap}>
+                <Text style={[styles.amount, { color: isPaid ? theme.textPrimary : theme.error }]}>₹{item.totalAmount}</Text>
+                <View style={[styles.statusBadge, { backgroundColor: isPaid ? '#E8FAF0' : '#FFF0F0' }]}>
+                  <Text style={[styles.statusText, { color: isPaid ? '#22C55E' : theme.error }]}>
+                    {item.paymentStatus}
+                  </Text>
+                </View>
+              </View>
             </View>
-          </View>
-        )}
+          );
+        }}
         ListEmptyComponent={<EmptyState icon="receipt-outline" title="No transactions yet" />}
         contentContainerStyle={{ flexGrow: 1, padding: SPACING.md }}
       />

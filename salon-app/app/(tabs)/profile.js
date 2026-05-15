@@ -77,11 +77,11 @@ export default function Profile() {
 
         {/* Quick Stats */}
         <View style={[styles.statsRow, { backgroundColor: theme.card, shadowColor: theme.shadow }]}>
-          <StatItem label="Bookings" value={user?.bookingsCount || '0'} theme={theme} />
+          <StatItem label="Points" value={user?.loyaltyPoints || 0} theme={theme} />
           <View style={[styles.statDivider, { backgroundColor: theme.border }]} />
-          <StatItem label="Points" value={user?.loyaltyPoints || '0'} theme={theme} />
+          <StatItem label="Wallet" value={`₹${user?.walletBalance || 0}`} theme={theme} />
           <View style={[styles.statDivider, { backgroundColor: theme.border }]} />
-          <StatItem label="Saved" value={user?.favoritesCount || '0'} theme={theme} />
+          <StatItem label="Saved" value={user?.favoriteSalons?.length || 0} theme={theme} />
         </View>
 
         {/* Menu */}

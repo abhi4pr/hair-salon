@@ -10,10 +10,12 @@ export const getMe = asyncHandler(async (req, res) => {
 });
 
 export const updateMe = asyncHandler(async (req, res) => {
-  const { name, phone, fcmToken } = req.body;
+  const { name, phone, dob, gender, fcmToken } = req.body;
   const updates = {};
   if (name) updates.name = name;
   if (phone) updates.phone = phone;
+  if (dob !== undefined) updates.dob = dob;
+  if (gender !== undefined) updates.gender = gender;
   if (fcmToken) updates.fcmToken = fcmToken;
 
   if (req.file) {

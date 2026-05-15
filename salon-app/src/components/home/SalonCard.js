@@ -54,7 +54,7 @@ export default function SalonCard({ salon, onFavoriteToggle, isFavorite, compact
           <View style={styles.metaRow}>
             <Ionicons name="location-outline" size={12} color={COLORS.primary} />
             <Text style={[styles.meta, { color: theme.textSecondary }]} numberOfLines={1}>
-              {salon.address?.area || salon.address?.city}
+              {salon.location?.address || salon.location?.city}
             </Text>
             {salon.distance != null && (
               <Text style={[styles.dist, { color: theme.textSecondary }]}>

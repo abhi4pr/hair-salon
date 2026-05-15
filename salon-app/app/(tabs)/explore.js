@@ -50,7 +50,7 @@ export default function Explore() {
         page: currentPage,
         limit: 15,
       });
-      const newSalons = res.data.data?.salons || [];
+      const newSalons = res.data.data || [];
       setSalons(reset ? newSalons : prev => [...prev, ...newSalons]);
       setHasMore(newSalons.length === 15);
       if (!reset) setPage(p => p + 1);

@@ -37,8 +37,8 @@ export default function Home() {
         salonsApi.search({ sort: 'rating', limit: 10 }),
         userApi.getFavorites(),
       ]);
-      setSalons(nearbRes.data.data?.salons || []);
-      setTopRated(topRes.data.data?.salons || []);
+      setSalons(nearbRes.data.data || []);
+      setTopRated(topRes.data.data || []);
       const favIds = (favRes.data.data || []).map(s => s._id);
       setFavorites(favIds);
     } catch (err) {

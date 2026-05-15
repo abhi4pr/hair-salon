@@ -53,10 +53,11 @@ export default function BookAppointment() {
     if (!salon) return;
     setSlotsLoading(true);
     const dateStr = selectedDate.toISOString().split('T')[0];
+    if (!selectedServices.length) { setSlots([]); setSlotsLoading(false); return; }
     appointmentsApi.getSlots(salonId, {
       date: dateStr,
       staffId: selectedStaff?._id,
-      serviceIds: selectedServices.map(s => s._id),
+      services: selectedServices.map(s => s._id).join(','),
     }).then(res => {
       setSlots(res.data.data?.slots || []);
       setSelectedTime(null);
@@ -108,7 +109,7 @@ export default function BookAppointment() {
             <View>
               <Text style={[styles.salonName, { color: theme.textPrimary }]}>{salon.name}</Text>
               <Text style={[styles.salonAddress, { color: theme.textSecondary }]} numberOfLines={1}>
-                {salon.address?.area}, {salon.address?.city}
+                {[salon.location?.address, salon.location?.city].filter(Boolean).join(', ')}
               </Text>
             </View>
           </View>
@@ -171,23 +172,21 @@ export default function BookAppointment() {
         ) : slots.length ? (
           <View style={styles.slotsGrid}>
             {slots.map((slot, i) => {
-              const isSelected = selectedTime === slot.time;
+              const isSelected = selectedTime === slot.startTime;
               return (
                 <TouchableOpacity
                   key={i}
-                  disabled={!slot.available}
                   style={[
                     styles.slot,
                     {
-                      backgroundColor: isSelected ? COLORS.primary : slot.available ? theme.card : theme.surface,
+                      backgroundColor: isSelected ? COLORS.primary : theme.card,
                       borderColor: isSelected ? COLORS.primary : theme.border,
-                      opacity: slot.available ? 1 : 0.4,
                     },
                   ]}
-                  onPress={() => setSelectedTime(slot.time)}
+                  onPress={() => setSelectedTime(slot.startTime)}
                 >
-                  <Text style={[styles.slotText, { color: isSelected ? '#FFF' : slot.available ? theme.textPrimary : theme.textSecondary }]}>
-                    {slot.time}
+                  <Text style={[styles.slotText, { color: isSelected ? '#FFF' : theme.textPrimary }]}>
+                    {slot.startTime}
                   </Text>
                 </TouchableOpacity>
               );

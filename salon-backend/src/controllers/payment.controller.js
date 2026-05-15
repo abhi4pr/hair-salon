@@ -48,7 +48,8 @@ export const getPaymentHistory = asyncHandler(async (req, res) => {
     customer: req.user._id,
     paymentStatus: { $in: ['paid', 'partially_paid', 'refunded'] },
   })
-    .select('totalAmount paymentMethod paymentStatus date invoiceUrl tipAmount discountAmount')
+    .select('totalAmount paymentMethod paymentStatus date invoiceUrl tipAmount discountAmount createdAt salon')
+    .populate('salon', 'name images')
     .sort({ date: -1 });
   success(res, 'Payment history fetched', appointments);
 });

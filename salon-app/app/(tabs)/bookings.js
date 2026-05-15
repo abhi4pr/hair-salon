@@ -40,7 +40,7 @@ export default function Bookings() {
     try {
       const statusMap = { upcoming: 'pending,confirmed', completed: 'completed', cancelled: 'cancelled' };
       const res = await appointmentsApi.getMy({ status: statusMap[activeTab] });
-      setBookings(res.data.data?.appointments || []);
+      setBookings(res.data.data || []);
     } catch {}
     setLoading(false);
   }, [activeTab]);
@@ -91,7 +91,7 @@ export default function Bookings() {
           <View style={styles.infoRow}>
             <Ionicons name="location-outline" size={12} color={COLORS.primary} />
             <Text style={[styles.infoText, { color: theme.textSecondary }]} numberOfLines={1}>
-              {item.salon?.address?.area || item.salon?.address?.city}
+              {item.salon?.location?.address || item.salon?.location?.city}
             </Text>
           </View>
           <View style={styles.infoRow}>
@@ -114,7 +114,7 @@ export default function Bookings() {
         <View style={styles.metaItem}>
           <Ionicons name="calendar-outline" size={14} color={theme.icon} />
           <Text style={[styles.metaText, { color: theme.textSecondary }]}>
-            {new Date(item.appointmentDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
+            {new Date(item.date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
           </Text>
         </View>
         <View style={styles.metaItem}>

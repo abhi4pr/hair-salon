@@ -40,7 +40,7 @@ export default function SalonDetail() {
       userApi.getFavorites(),
     ]).then(([salonRes, reviewRes, favRes]) => {
       setSalon(salonRes.data.data);
-      setReviews(reviewRes.data.data?.reviews || []);
+      setReviews(reviewRes.data.data || []);
       const favIds = (favRes.data.data || []).map(s => s._id);
       setIsFavorite(favIds.includes(id));
     }).catch(() => {}).finally(() => setLoading(false));
@@ -55,10 +55,10 @@ export default function SalonDetail() {
   };
 
   const isOpenNow = () => {
-    if (!salon?.businessHours) return null;
+    if (!salon?.businessHours?.length) return null;
     const now = new Date();
     const day = now.toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase();
-    const todayHours = salon.businessHours[day];
+    const todayHours = salon.businessHours.find(h => h.day === day);
     if (!todayHours || todayHours.isClosed) return false;
     return true;
   };
@@ -126,12 +126,12 @@ export default function SalonDetail() {
                 <View style={styles.reviewHeader}>
                   <View style={[styles.reviewAvatar, { backgroundColor: COLORS.primaryBg }]}>
                     <Text style={[styles.reviewInitial, { color: COLORS.primary }]}>
-                      {rev.user?.name?.charAt(0)?.toUpperCase() || 'U'}
+                      {rev.customer?.name?.charAt(0)?.toUpperCase() || 'U'}
                     </Text>
                   </View>
                   <View style={styles.reviewInfo}>
-                    <Text style={[styles.reviewName, { color: theme.textPrimary }]}>{rev.user?.name}</Text>
-                    <StarRating rating={rev.rating} size={12} />
+                    <Text style={[styles.reviewName, { color: theme.textPrimary }]}>{rev.customer?.name}</Text>
+                    <StarRating rating={rev.salonRating} size={12} />
                   </View>
                   <Text style={[styles.reviewDate, { color: theme.textSecondary }]}>
                     {new Date(rev.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })}
@@ -203,7 +203,7 @@ export default function SalonDetail() {
             <View style={styles.metaRow}>
               <Ionicons name="location-outline" size={14} color={COLORS.primary} />
               <Text style={[styles.metaText, { color: theme.textSecondary }]}>
-                {[salon.address?.street, salon.address?.area, salon.address?.city].filter(Boolean).join(', ')}
+                {[salon.location?.address, salon.location?.city, salon.location?.state].filter(Boolean).join(', ')}
               </Text>
             </View>
             <View style={styles.metaRow}>
@@ -221,8 +221,7 @@ export default function SalonDetail() {
           {/* Action Buttons */}
           <View style={styles.actionBtns}>
             {[
-              { icon: 'globe-outline', label: t('website'), onPress: () => salon.website && Linking.openURL(salon.website) },
-              { icon: 'chatbubble-outline', label: t('message'), onPress: () => router.push(`/chat/new?salonId=${id}`) },
+              { icon: 'chatbubble-outline', label: t('message'), onPress: () => router.push(`/chat/${id}`) },
               { icon: 'call-outline', label: t('call'), onPress: () => salon.phone && Linking.openURL(`tel:${salon.phone}`) },
               { icon: 'navigate-outline', label: t('direction'), onPress: () => {} },
             ].map(btn => (

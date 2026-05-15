@@ -48,7 +48,7 @@ export default function Payment() {
   const applyCoupon = async () => {
     if (!coupon.trim()) return;
     try {
-      const res = await offersApi.applyCoupon({ code: coupon, salonId: params.salonId, amount: subtotal });
+      const res = await offersApi.applyCoupon({ code: coupon, salonId: params.salonId, orderAmount: subtotal });
       const disc = res.data.data?.discountAmount || 0;
       setDiscount(disc);
       setCouponApplied(true);
@@ -63,13 +63,12 @@ export default function Payment() {
     try {
       const res = await appointmentsApi.create({
         salonId: params.salonId,
-        serviceIds,
+        services: serviceIds,
         staffId: params.staffId || undefined,
-        appointmentDate: new Date(params.date).toISOString().split('T')[0],
+        date: new Date(params.date).toISOString().split('T')[0],
         startTime: params.time,
         paymentMethod: payMethod,
         couponCode: couponApplied ? coupon : undefined,
-        tip,
       });
       const appointmentId = res.data.data?._id;
       router.replace({ pathname: '/booking/confirmation', params: { appointmentId, total } });
@@ -91,7 +90,7 @@ export default function Payment() {
         {/* Booking Summary */}
         <View style={[styles.card, { backgroundColor: theme.card }]}>
           <Row label="Barber/Salon" value={salon?.name} theme={theme} />
-          <Row label="Address" value={[salon?.address?.area, salon?.address?.city].filter(Boolean).join(', ')} theme={theme} />
+          <Row label="Address" value={[salon?.location?.address, salon?.location?.city].filter(Boolean).join(', ')} theme={theme} />
           <Row label="Name" value={user?.name} theme={theme} />
           <Row label="Phone" value={user?.phone} theme={theme} />
           <Row label="Booking Date" value={new Date(params.date).toLocaleDateString('en-IN', { day: '2-digit', month: 'long', year: 'numeric' })} theme={theme} />

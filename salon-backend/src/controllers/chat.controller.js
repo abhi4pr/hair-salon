@@ -25,6 +25,25 @@ export const getConversation = asyncHandler(async (req, res) => {
   success(res, 'Conversation fetched', data, 200, pagination);
 });
 
+export const getMyConversations = asyncHandler(async (req, res) => {
+  const conversations = await ChatMessage.aggregate([
+    { $match: { customer: req.user._id } },
+    { $sort: { createdAt: -1 } },
+    {
+      $group: {
+        _id: '$salon',
+        lastMessage: { $first: '$$ROOT' },
+        unreadCount: {
+          $sum: { $cond: [{ $and: [{ $eq: ['$isRead', false] }, { $eq: ['$senderRole', 'salon_owner'] }] }, 1, 0] },
+        },
+      },
+    },
+    { $lookup: { from: 'salons', localField: '_id', foreignField: '_id', as: 'salon' } },
+    { $unwind: '$salon' },
+  ]);
+  success(res, 'Conversations fetched', conversations);
+});
+
 export const getSalonConversations = asyncHandler(async (req, res) => {
   const salon = await Salon.findOne({ owner: req.user._id });
   if (!salon) throw new AppError('Salon not found', 404);

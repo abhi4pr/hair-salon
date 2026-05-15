@@ -53,7 +53,7 @@ export default function Chat() {
           </View>
           <View style={styles.itemRow}>
             <Text style={[styles.preview, { color: theme.textSecondary }]} numberOfLines={1}>
-              {lastMsg?.content || 'Start a conversation'}
+              {lastMsg?.message || 'Start a conversation'}
             </Text>
             {item.unreadCount > 0 && (
               <View style={[styles.badge, { backgroundColor: COLORS.primary }]}>

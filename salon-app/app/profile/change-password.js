@@ -36,7 +36,7 @@ export default function ChangePassword() {
     }
     setLoading(true);
     try {
-      await userApi.changePassword({ currentPassword: form.currentPassword, newPassword: form.newPassword });
+      await userApi.changePassword({ oldPassword: form.currentPassword, newPassword: form.newPassword });
       Toast.show({ type: 'success', text1: 'Password changed successfully' });
       router.back();
     } catch (err) {

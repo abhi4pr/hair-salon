@@ -23,8 +23,11 @@ const useAuthStore = create((set, get) => ({
   },
 
   setAuth: async ({ token, refreshToken, user }) => {
-    await SecureStore.setItemAsync('token', token);
-    await SecureStore.setItemAsync('refreshToken', refreshToken || '');
+    if (!token || !user) {
+      throw new Error(`setAuth received invalid payload: token=${!!token}, user=${!!user}`);
+    }
+    await SecureStore.setItemAsync('token', String(token));
+    await SecureStore.setItemAsync('refreshToken', String(refreshToken || ''));
     await SecureStore.setItemAsync('user', JSON.stringify(user));
     set({ token, refreshToken, user, isAuthenticated: true });
   },

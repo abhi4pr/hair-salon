@@ -38,7 +38,7 @@ export default function Loyalty() {
       {/* Points Card */}
       <View style={[styles.pointsCard, { backgroundColor: COLORS.primary }]}>
         <Text style={styles.pointsLabel}>{t('yourPoints')}</Text>
-        <Text style={styles.pointsValue}>{data?.points || 0}</Text>
+        <Text style={styles.pointsValue}>{data?.loyaltyPoints || 0}</Text>
         <Text style={styles.pointsSub}>1 point = ₹1 discount on your next booking</Text>
       </View>
 
@@ -58,20 +58,25 @@ export default function Loyalty() {
           data={history}
           keyExtractor={(_, i) => i.toString()}
           renderItem={({ item }) => (
-            <View style={[styles.historyItem, { borderBottomColor: theme.border }]}>
-              <View style={[styles.historyIcon, { backgroundColor: item.type === 'earn' ? '#E8FAF0' : '#FFF0F0' }]}>
-                <Ionicons name={item.type === 'earn' ? 'add-circle-outline' : 'remove-circle-outline'} size={20} color={item.type === 'earn' ? '#22C55E' : theme.error} />
-              </View>
-              <View style={styles.historyInfo}>
-                <Text style={[styles.historyLabel, { color: theme.textPrimary }]}>{item.description}</Text>
-                <Text style={[styles.historyDate, { color: theme.textSecondary }]}>
-                  {new Date(item.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
-                </Text>
-              </View>
-              <Text style={[styles.historyPoints, { color: item.type === 'earn' ? '#22C55E' : theme.error }]}>
-                {item.type === 'earn' ? '+' : '-'}{item.points}
-              </Text>
-            </View>
+            (() => {
+              const isCredit = item.points > 0;
+              return (
+                <View style={[styles.historyItem, { borderBottomColor: theme.border }]}>
+                  <View style={[styles.historyIcon, { backgroundColor: isCredit ? '#E8FAF0' : '#FFF0F0' }]}>
+                    <Ionicons name={isCredit ? 'add-circle-outline' : 'remove-circle-outline'} size={20} color={isCredit ? '#22C55E' : theme.error} />
+                  </View>
+                  <View style={styles.historyInfo}>
+                    <Text style={[styles.historyLabel, { color: theme.textPrimary }]}>{item.description}</Text>
+                    <Text style={[styles.historyDate, { color: theme.textSecondary }]}>
+                      {new Date(item.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
+                    </Text>
+                  </View>
+                  <Text style={[styles.historyPoints, { color: isCredit ? '#22C55E' : theme.error }]}>
+                    {isCredit ? '+' : ''}{item.points}
+                  </Text>
+                </View>
+              );
+            })()
           )}
           contentContainerStyle={{ flexGrow: 1, padding: SPACING.md }}
         />
@@ -84,7 +89,7 @@ export default function Loyalty() {
               <View style={styles.planHeader}>
                 <Text style={[styles.planName, { color: theme.textPrimary }]}>{item.name}</Text>
                 <View style={[styles.planBadge, { backgroundColor: COLORS.primaryBg }]}>
-                  <Text style={[styles.planBadgeText, { color: COLORS.primary }]}>{item.duration} days</Text>
+                  <Text style={[styles.planBadgeText, { color: COLORS.primary }]}>{item.durationDays} days</Text>
                 </View>
               </View>
               <Text style={[styles.planPrice, { color: COLORS.primary }]}>₹{item.price}</Text>

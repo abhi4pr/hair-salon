@@ -1,8 +1,7 @@
 import client from './client';
 
 export const chatApi = {
-  getConversations: () => client.get('/chat/conversations'),
-  getMessages: (conversationId, params) => client.get(`/chat/conversations/${conversationId}/messages`, { params }),
+  getConversations: () => client.get('/chat/my-conversations'),
+  getMessages: (salonId, params) => client.get(`/chat/messages/${salonId}`, { params }),
   sendMessage: (data) => client.post('/chat/messages', data),
-  startConversation: (data) => client.post('/chat/conversations', data),
 };

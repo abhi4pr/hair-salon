@@ -167,7 +167,10 @@ export const createAppointment = asyncHandler(async (req, res) => {
 export const getMyAppointments = asyncHandler(async (req, res) => {
   const { status, page, limit } = req.query;
   const query = { customer: req.user._id };
-  if (status) query.status = status;
+  if (status) {
+    const statuses = String(status).split(',').map(s => s.trim()).filter(Boolean);
+    query.status = statuses.length > 1 ? { $in: statuses } : statuses[0];
+  }
   const { data, pagination } = await paginate(Appointment, query, { page, limit, populate: 'salon staff services', sort: { date: -1 } });
   success(res, 'Appointments fetched', data, 200, pagination);
 });
@@ -177,7 +180,10 @@ export const getSalonAppointments = asyncHandler(async (req, res) => {
   if (!salon) throw new AppError('Salon not found', 404);
   const { status, date, page, limit } = req.query;
   const query = { salon: salon._id };
-  if (status) query.status = status;
+  if (status) {
+    const statuses = String(status).split(',').map(s => s.trim()).filter(Boolean);
+    query.status = statuses.length > 1 ? { $in: statuses } : statuses[0];
+  }
   if (date) {
     const d = moment(date).startOf('day');
     query.date = { $gte: d.toDate(), $lt: moment(d).endOf('day').toDate() };

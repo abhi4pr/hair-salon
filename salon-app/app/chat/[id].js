@@ -22,7 +22,7 @@ export default function ChatConversation() {
 
   useEffect(() => {
     chatApi.getMessages(id).then(res => {
-      setMessages(res.data.data?.messages || []);
+      setMessages(res.data.data || []);
       setTimeout(() => flatListRef.current?.scrollToEnd(), 100);
     }).catch(() => {});
   }, [id]);
@@ -33,7 +33,7 @@ export default function ChatConversation() {
     setText('');
     setSending(true);
     try {
-      const res = await chatApi.sendMessage({ conversationId: id, content: msg });
+      const res = await chatApi.sendMessage({ salonId: id, message: msg });
       setMessages(prev => [...prev, res.data.data]);
       setTimeout(() => flatListRef.current?.scrollToEnd(), 100);
     } catch {}
@@ -41,14 +41,14 @@ export default function ChatConversation() {
   };
 
   const renderMessage = ({ item }) => {
-    const isMine = item.sender?._id === user?._id || item.senderType === 'user';
+    const isMine = item.senderRole === user?.role;
     return (
       <View style={[styles.messageWrap, isMine ? styles.myMsgWrap : styles.theirMsgWrap]}>
         <View style={[
           styles.bubble,
           isMine ? [styles.myBubble, { backgroundColor: COLORS.primary }] : [styles.theirBubble, { backgroundColor: theme.card }],
         ]}>
-          <Text style={[styles.msgText, { color: isMine ? '#FFF' : theme.textPrimary }]}>{item.content}</Text>
+          <Text style={[styles.msgText, { color: isMine ? '#FFF' : theme.textPrimary }]}>{item.message}</Text>
           <Text style={[styles.msgTime, { color: isMine ? 'rgba(255,255,255,0.7)' : theme.textSecondary }]}>
             {new Date(item.createdAt).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}
           </Text>

@@ -1,4 +1,6 @@
 import Salon from '../models/Salon.js';
+import Service from '../models/Service.js';
+import Staff from '../models/Staff.js';
 import AppError from '../../errors/AppError.js';
 import asyncHandler from '../utils/asyncHandler.js';
 import { success } from '../utils/apiResponse.js';
@@ -30,11 +32,21 @@ export const updateSalon = asyncHandler(async (req, res) => {
 export const getSalonById = asyncHandler(async (req, res) => {
   const salon = await Salon.findById(req.params.id).populate('owner', 'name email phone');
   if (!salon || !salon.isActive) throw new AppError('Salon not found', 404);
-  success(res, 'Salon fetched', salon);
+
+  const [services, staff] = await Promise.all([
+    Service.find({ salon: salon._id, isActive: true }),
+    Staff.find({ salon: salon._id, isActive: true }),
+  ]);
+
+  const data = salon.toObject();
+  data.services = services;
+  data.staff = staff;
+  data.phone = salon.owner?.phone || '';
+  success(res, 'Salon fetched', data);
 });
 
 export const searchSalons = asyncHandler(async (req, res) => {
-  const { q, city, category, minRating, lat, lng, radius = 10000 } = req.query;
+  const { q, city, category, minRating, lat, lng, radius = 10000, sort, service } = req.query;
   const query = { isActive: true, isApproved: true };
   if (city) query['location.city'] = new RegExp(city, 'i');
   if (category) query.category = category;
@@ -51,7 +63,23 @@ export const searchSalons = asyncHandler(async (req, res) => {
 
   if (q && !lat) query.$text = { $search: q };
 
-  const { data, pagination } = await paginate(Salon, query, { page: req.query.page, limit: req.query.limit });
+  if (service) {
+    const matching = await Service.find({ category: new RegExp(`^${service}$`, 'i'), isActive: true }).distinct('salon');
+    query._id = { $in: matching };
+  }
+
+  const sortMap = {
+    rating: { averageRating: -1 },
+    price_asc: { averageRating: 1 },
+    newest: { createdAt: -1 },
+  };
+  const sortOption = sort && sortMap[sort] ? sortMap[sort] : undefined;
+
+  const { data, pagination } = await paginate(Salon, query, {
+    page: req.query.page,
+    limit: req.query.limit,
+    ...(sortOption ? { sort: sortOption } : {}),
+  });
   success(res, 'Salons fetched', data, 200, pagination);
 });
 
