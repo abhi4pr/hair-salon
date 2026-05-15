@@ -52,28 +52,29 @@ function QuickAction({ icon, label, color, onPress }) {
 
 function RecentRow({ item, theme }) {
   const statusColor = STATUS_COLORS[item.status] || theme.textSecondary;
-  const d = item.scheduledAt ? new Date(item.scheduledAt) : null;
+  const d = item.date ? new Date(item.date) : null;
   const isValid = d && !isNaN(d.getTime());
   const dateStr = isValid
-    ? `${d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}  ${d.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}`
+    ? `${d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}  ${item.startTime || ''}`
     : 'Date not set';
+  const customer = item.customer;
 
   return (
     <View style={[styles.recentRow, { borderBottomColor: theme.border }]}>
       <View style={[styles.recentAvatar, { backgroundColor: COLORS.primaryBg }]}>
-        {item.user?.avatar
-          ? <Image source={{ uri: item.user.avatar }} style={styles.recentAvatarImg} />
+        {customer?.avatar
+          ? <Image source={{ uri: customer.avatar }} style={styles.recentAvatarImg} />
           : <Text style={[styles.recentAvatarText, { color: COLORS.primary }]}>
-              {item.user?.name?.charAt(0)?.toUpperCase() || 'C'}
+              {customer?.name?.charAt(0)?.toUpperCase() || 'C'}
             </Text>
         }
       </View>
       <View style={styles.recentInfo}>
         <Text style={[styles.recentName, { color: theme.textPrimary }]} numberOfLines={1}>
-          {item.user?.name || 'Customer'}
+          {customer?.name || 'Customer'}
         </Text>
         <Text style={[styles.recentService, { color: theme.textSecondary }]} numberOfLines={1}>
-          {item.services?.map(s => s.service?.name).join(', ') || '—'}
+          {item.services?.map(s => s.name).join(', ') || '—'}
         </Text>
         <View style={styles.recentMeta}>
           <Ionicons name="time-outline" size={11} color={theme.icon} />

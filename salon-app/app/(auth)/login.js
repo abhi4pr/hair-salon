@@ -57,7 +57,7 @@ export default function Login() {
         text1: "Loggedin successful",
       });
       router.replace(
-        user?.role === "salon_owner" ? "/(owner-tabs)" : "/(tabs)",
+        user?.role === "salon_owner" ? "/(owner-tabs)/dashboard" : "/(tabs)",
       );
     } catch (err) {
       const msg =

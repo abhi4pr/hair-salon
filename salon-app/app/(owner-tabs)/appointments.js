@@ -63,28 +63,29 @@ export default function OwnerAppointments() {
 
   const renderItem = ({ item }) => {
     const statusColor = STATUS_COLORS[item.status] || theme.textSecondary;
-    const scheduledDate = item.scheduledAt ? new Date(item.scheduledAt) : null;
-    const isValidDate = scheduledDate && !isNaN(scheduledDate.getTime());
+    const apptDate = item.date ? new Date(item.date) : null;
+    const isValidDate = apptDate && !isNaN(apptDate.getTime());
+    const customer = item.customer;
 
     return (
       <View style={[styles.card, { backgroundColor: theme.card, shadowColor: theme.shadow }]}>
         <View style={styles.cardHeader}>
           <View style={styles.customerRow}>
-            {item.user?.avatar ? (
-              <Image source={{ uri: item.user.avatar }} style={styles.customerAvatar} />
+            {customer?.avatar ? (
+              <Image source={{ uri: customer.avatar }} style={styles.customerAvatar} />
             ) : (
               <View style={[styles.avatarPlaceholder, { backgroundColor: COLORS.primaryBg }]}>
                 <Text style={[styles.avatarInitial, { color: COLORS.primary }]}>
-                  {item.user?.name?.charAt(0)?.toUpperCase() || 'C'}
+                  {customer?.name?.charAt(0)?.toUpperCase() || 'C'}
                 </Text>
               </View>
             )}
             <View style={{ flex: 1 }}>
               <Text style={[styles.customerName, { color: theme.textPrimary }]}>
-                {item.user?.name || 'Customer'}
+                {customer?.name || 'Customer'}
               </Text>
               <Text style={[styles.customerPhone, { color: theme.textSecondary }]}>
-                {item.user?.phone || ''}
+                {customer?.phone || ''}
               </Text>
             </View>
             <View style={[styles.statusBadge, { backgroundColor: statusColor + '20' }]}>
@@ -101,14 +102,14 @@ export default function OwnerAppointments() {
           <View style={styles.detailRow}>
             <Ionicons name="cut-outline" size={14} color={theme.icon} />
             <Text style={[styles.detailText, { color: theme.textSecondary }]} numberOfLines={2}>
-              {item.services?.map(s => s.service?.name).join(', ') || '—'}
+              {item.services?.map(s => s.name).join(', ') || '—'}
             </Text>
           </View>
           <View style={styles.detailRow}>
             <Ionicons name="calendar-outline" size={14} color={theme.icon} />
             <Text style={[styles.detailText, { color: theme.textSecondary }]}>
               {isValidDate
-                ? `${scheduledDate.toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short' })}  ${scheduledDate.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}`
+                ? `${apptDate.toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short' })}  ${item.startTime || ''}`
                 : 'Date not set'}
             </Text>
           </View>
