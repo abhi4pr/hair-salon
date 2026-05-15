@@ -56,7 +56,7 @@ export default function VerifyOTP() {
       const { token, refreshToken, user } = res.data.data;
       await setAuth({ token, refreshToken, user });
       Toast.show({ type: 'success', text1: 'Verified!', text2: 'Welcome to SalonApp' });
-      router.replace('/(tabs)');
+      router.replace(user?.role === 'salon_owner' ? '/(owner-tabs)' : '/(tabs)');
     } catch (err) {
       Toast.show({ type: 'error', text1: 'Error', text2: err.response?.data?.message || 'Invalid OTP' });
     } finally {

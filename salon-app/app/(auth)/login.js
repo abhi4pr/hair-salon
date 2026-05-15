@@ -42,7 +42,7 @@ export default function Login() {
       const res = await authApi.login({ email: email.trim().toLowerCase(), password });
       const { token, refreshToken, user } = res.data.data;
       await setAuth({ token, refreshToken, user });
-      router.replace('/(tabs)');
+      router.replace(user?.role === 'salon_owner' ? '/(owner-tabs)' : '/(tabs)');
     } catch (err) {
       const msg = err.response?.data?.message || 'Login failed. Please try again.';
       Toast.show({ type: 'error', text1: 'Error', text2: msg });

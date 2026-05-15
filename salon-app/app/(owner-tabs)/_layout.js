@@ -2,10 +2,12 @@ import { Tabs } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../../src/context/ThemeContext';
 import { COLORS } from '../../src/theme/colors';
-import { Platform } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function OwnerTabLayout() {
   const { theme } = useTheme();
+  const insets = useSafeAreaInsets();
+  const bottomPad = Math.max(insets.bottom, 8);
 
   return (
     <Tabs
@@ -17,8 +19,8 @@ export default function OwnerTabLayout() {
           backgroundColor: theme.tabBar,
           borderTopColor: theme.tabBarBorder,
           borderTopWidth: 1,
-          height: Platform.OS === 'ios' ? 88 : 62,
-          paddingBottom: Platform.OS === 'ios' ? 28 : 8,
+          height: 60 + bottomPad,
+          paddingBottom: bottomPad,
           paddingTop: 8,
           elevation: 8,
           shadowOpacity: 0.1,
