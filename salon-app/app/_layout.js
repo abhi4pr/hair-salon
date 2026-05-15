@@ -9,7 +9,7 @@ import { ThemeProvider, useTheme } from '../src/context/ThemeContext';
 import { LangProvider } from '../src/context/LangContext';
 import useAuthStore from '../src/store/authStore';
 
-SplashScreen.preventAutoHideAsync();
+SplashScreen.preventAutoHideAsync().catch(() => {});
 
 function AppContent() {
   const { theme, isDark } = useTheme();
@@ -20,7 +20,10 @@ function AppContent() {
 
   useEffect(() => {
     if (!isLoading) {
-      SplashScreen.hideAsync();
+      const timer = setTimeout(() => {
+        SplashScreen.hideAsync().catch(() => {});
+      }, 300);
+      return () => clearTimeout(timer);
     }
   }, [isLoading]);
 
@@ -42,7 +45,7 @@ function AppContent() {
         <Stack.Screen name="profile/loyalty" />
         <Stack.Screen name="profile/settings" />
         <Stack.Screen name="profile/change-password" />
-        <Stack.Screen name="help/index" />
+        <Stack.Screen name="help" />
         <Stack.Screen name="help/privacy" />
         <Stack.Screen name="chat/[id]" />
       </Stack>

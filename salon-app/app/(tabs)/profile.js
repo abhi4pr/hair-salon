@@ -31,7 +31,7 @@ const MENU_ITEMS = [
     icon: "receipt-outline",
     route: "/profile/transactions",
   },
-  { key: "helpCenter", icon: "help-circle-outline", route: "/help/index" },
+  { key: "helpCenter", icon: "help-circle-outline", route: "/help" },
   {
     key: "privacyPolicy",
     icon: "shield-checkmark-outline",

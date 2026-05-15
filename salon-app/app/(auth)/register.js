@@ -88,17 +88,10 @@ export default function Register() {
       style={[styles.container, { backgroundColor: theme.background }]}
     >
       <ScrollView
-        contentContainerStyle={[
-          styles.scroll,
-          { paddingTop: insets.top + SPACING.xl },
-        ]}
+        contentContainerStyle={[styles.scroll, { paddingTop: insets.top + 90 }]}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
-        <TouchableOpacity onPress={() => router.back()} style={styles.back}>
-          <Ionicons name="arrow-back" size={22} color={theme.textPrimary} />
-        </TouchableOpacity>
-
         <View
           style={[
             styles.card,
@@ -222,7 +215,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: SPACING.md,
     paddingBottom: SPACING.xl,
   },
-  back: { marginBottom: SPACING.md, padding: 4, alignSelf: "flex-start" },
   card: {
     borderRadius: RADIUS.xl,
     padding: SPACING.lg,

@@ -16,7 +16,8 @@ const useAuthStore = create((set, get) => ({
       const userStr = await SecureStore.getItemAsync('user');
       if (token && userStr) {
         const user = JSON.parse(userStr);
-        set({ token, refreshToken, user, isAuthenticated: true });
+        set({ token, refreshToken, user, isAuthenticated: true, isLoading: false });
+        return;
       }
     } catch {}
     set({ isLoading: false });

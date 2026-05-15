@@ -57,7 +57,7 @@ export default function Login() {
       style={[styles.container, { backgroundColor: theme.background }]}
     >
       <ScrollView
-        contentContainerStyle={[styles.scroll, { paddingTop: insets.top + SPACING.xxl }]}
+        contentContainerStyle={[styles.scroll, { paddingTop: insets.top + 80 }]}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
