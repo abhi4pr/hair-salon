@@ -11,7 +11,7 @@ export default function Index() {
     if (!isLoading) {
       if (isAuthenticated) {
         if (user?.role === 'salon_owner') {
-          router.replace('/(owner-tabs)');
+          router.replace('/(owner-tabs)/dashboard');
         } else {
           router.replace('/(tabs)');
         }

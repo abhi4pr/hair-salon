@@ -13,7 +13,7 @@ const OWNER_MENU = [
   { label: 'Language', icon: 'language-outline', route: '/profile/settings' },
   { label: 'Settings', icon: 'settings-outline', route: '/profile/settings' },
   { label: 'Change Password', icon: 'lock-closed-outline', route: '/profile/change-password' },
-  { label: 'Help Center', icon: 'help-circle-outline', route: '/help/index' },
+  { label: 'Help Center', icon: 'help-circle-outline', route: '/help' },
   { label: 'Privacy Policy', icon: 'shield-checkmark-outline', route: '/help/privacy' },
 ];
 

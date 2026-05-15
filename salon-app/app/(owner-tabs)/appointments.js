@@ -63,7 +63,8 @@ export default function OwnerAppointments() {
 
   const renderItem = ({ item }) => {
     const statusColor = STATUS_COLORS[item.status] || theme.textSecondary;
-    const scheduledDate = new Date(item.scheduledAt);
+    const scheduledDate = item.scheduledAt ? new Date(item.scheduledAt) : null;
+    const isValidDate = scheduledDate && !isNaN(scheduledDate.getTime());
 
     return (
       <View style={[styles.card, { backgroundColor: theme.card, shadowColor: theme.shadow }]}>
@@ -106,9 +107,9 @@ export default function OwnerAppointments() {
           <View style={styles.detailRow}>
             <Ionicons name="calendar-outline" size={14} color={theme.icon} />
             <Text style={[styles.detailText, { color: theme.textSecondary }]}>
-              {scheduledDate.toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short' })}
-              {'  '}
-              {scheduledDate.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}
+              {isValidDate
+                ? `${scheduledDate.toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short' })}  ${scheduledDate.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}`
+                : 'Date not set'}
             </Text>
           </View>
           <View style={styles.detailRow}>

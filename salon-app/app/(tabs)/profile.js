@@ -26,6 +26,7 @@ const MENU_ITEMS = [
     route: "/profile/loyalty",
   },
   { key: "settings", icon: "settings-outline", route: "/profile/settings" },
+  { key: "changePassword", icon: "lock-closed-outline", route: "/profile/change-password" },
   {
     key: "transactions",
     icon: "receipt-outline",

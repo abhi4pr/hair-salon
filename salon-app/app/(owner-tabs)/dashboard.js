@@ -11,57 +11,79 @@ import { ownerApi } from '../../src/api/owner';
 import { PageLoader } from '../../src/components/common/Loader';
 import { COLORS, FONT_SIZE, RADIUS, SPACING } from '../../src/theme/colors';
 
-function StatCard({ icon, label, value, color, theme }) {
+const STAT_CARDS = [
+  { key: 'revenue', label: 'Revenue', icon: 'wallet-outline', color: COLORS.primary, prefix: '₹' },
+  { key: 'total', label: 'Total', icon: 'calendar-outline', color: '#6366F1', prefix: '' },
+  { key: 'pending', label: 'Pending', icon: 'time-outline', color: '#F59E0B', prefix: '' },
+  { key: 'completed', label: 'Completed', icon: 'checkmark-circle-outline', color: '#22C55E', prefix: '' },
+];
+
+const STATUS_COLORS = {
+  pending: '#F59E0B',
+  confirmed: '#22C55E',
+  completed: '#6B7280',
+  cancelled: '#EF4444',
+};
+
+function StatCard({ stat, value, theme }) {
   return (
     <View style={[styles.statCard, { backgroundColor: theme.card, shadowColor: theme.shadow }]}>
-      <View style={[styles.statIcon, { backgroundColor: color + '20' }]}>
-        <Ionicons name={icon} size={22} color={color} />
+      <View style={[styles.statIconWrap, { backgroundColor: stat.color + '18' }]}>
+        <Ionicons name={stat.icon} size={20} color={stat.color} />
       </View>
-      <Text style={[styles.statValue, { color: theme.textPrimary }]}>{value}</Text>
-      <Text style={[styles.statLabel, { color: theme.textSecondary }]}>{label}</Text>
+      <Text style={[styles.statValue, { color: theme.textPrimary }]}>
+        {stat.prefix}{value}
+      </Text>
+      <Text style={[styles.statLabel, { color: theme.textSecondary }]}>{stat.label}</Text>
     </View>
   );
 }
 
-function AppointmentRow({ item, theme, onConfirm, onComplete }) {
-  const statusColor = {
-    pending: '#F59E0B',
-    confirmed: '#22C55E',
-    completed: theme.textSecondary,
-    cancelled: theme.error,
-  }[item.status] || theme.textSecondary;
+function QuickAction({ icon, label, color, onPress }) {
+  return (
+    <TouchableOpacity style={[styles.quickAction, { backgroundColor: color + '15' }]} onPress={onPress} activeOpacity={0.75}>
+      <View style={[styles.quickActionIcon, { backgroundColor: color }]}>
+        <Ionicons name={icon} size={20} color="#FFF" />
+      </View>
+      <Text style={[styles.quickActionLabel, { color }]}>{label}</Text>
+    </TouchableOpacity>
+  );
+}
+
+function RecentRow({ item, theme }) {
+  const statusColor = STATUS_COLORS[item.status] || theme.textSecondary;
+  const d = item.scheduledAt ? new Date(item.scheduledAt) : null;
+  const isValid = d && !isNaN(d.getTime());
+  const dateStr = isValid
+    ? `${d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}  ${d.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}`
+    : 'Date not set';
 
   return (
-    <View style={[styles.apptRow, { borderBottomColor: theme.border }]}>
-      <View style={styles.apptInfo}>
-        <Text style={[styles.apptCustomer, { color: theme.textPrimary }]} numberOfLines={1}>
+    <View style={[styles.recentRow, { borderBottomColor: theme.border }]}>
+      <View style={[styles.recentAvatar, { backgroundColor: COLORS.primaryBg }]}>
+        {item.user?.avatar
+          ? <Image source={{ uri: item.user.avatar }} style={styles.recentAvatarImg} />
+          : <Text style={[styles.recentAvatarText, { color: COLORS.primary }]}>
+              {item.user?.name?.charAt(0)?.toUpperCase() || 'C'}
+            </Text>
+        }
+      </View>
+      <View style={styles.recentInfo}>
+        <Text style={[styles.recentName, { color: theme.textPrimary }]} numberOfLines={1}>
           {item.user?.name || 'Customer'}
         </Text>
-        <Text style={[styles.apptService, { color: theme.textSecondary }]} numberOfLines={1}>
+        <Text style={[styles.recentService, { color: theme.textSecondary }]} numberOfLines={1}>
           {item.services?.map(s => s.service?.name).join(', ') || '—'}
         </Text>
-        <Text style={[styles.apptTime, { color: theme.textSecondary }]}>
-          {new Date(item.scheduledAt).toLocaleString('en-IN', {
-            day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit',
-          })}
-        </Text>
-      </View>
-      <View style={styles.apptRight}>
-        <View style={[styles.statusBadge, { backgroundColor: statusColor + '20' }]}>
-          <Text style={[styles.statusText, { color: statusColor }]}>
-            {item.status?.charAt(0).toUpperCase() + item.status?.slice(1)}
-          </Text>
+        <View style={styles.recentMeta}>
+          <Ionicons name="time-outline" size={11} color={theme.icon} />
+          <Text style={[styles.recentTime, { color: theme.textSecondary }]}>{dateStr}</Text>
         </View>
-        {item.status === 'pending' && (
-          <TouchableOpacity style={[styles.actionBtn, { backgroundColor: COLORS.primary }]} onPress={() => onConfirm(item._id)}>
-            <Text style={styles.actionBtnText}>Confirm</Text>
-          </TouchableOpacity>
-        )}
-        {item.status === 'confirmed' && (
-          <TouchableOpacity style={[styles.actionBtn, { backgroundColor: '#22C55E' }]} onPress={() => onComplete(item._id)}>
-            <Text style={styles.actionBtnText}>Complete</Text>
-          </TouchableOpacity>
-        )}
+      </View>
+      <View style={[styles.statusPill, { backgroundColor: statusColor + '18' }]}>
+        <Text style={[styles.statusPillText, { color: statusColor }]}>
+          {item.status?.charAt(0).toUpperCase() + item.status?.slice(1)}
+        </Text>
       </View>
     </View>
   );
@@ -106,33 +128,24 @@ export default function OwnerDashboard() {
 
   const handleRefresh = () => { setRefreshing(true); fetchData(); };
 
-  const handleConfirm = async (id) => {
-    try {
-      await ownerApi.updateAppointmentStatus(id, 'confirmed');
-      fetchData();
-    } catch {}
-  };
-
-  const handleComplete = async (id) => {
-    try {
-      await ownerApi.updateAppointmentStatus(id, 'completed');
-      fetchData();
-    } catch {}
-  };
-
   if (loading) return <PageLoader />;
 
   const hour = new Date().getHours();
   const greeting = hour < 12 ? 'Good Morning' : hour < 17 ? 'Good Afternoon' : 'Good Evening';
+  const today = new Date().toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long' });
 
   return (
     <View style={[styles.container, { backgroundColor: theme.background, paddingTop: insets.top }]}>
+      {/* Header */}
       <View style={[styles.header, { borderBottomColor: theme.border }]}>
-        <View>
-          <Text style={[styles.greeting, { color: theme.textSecondary }]}>{greeting},</Text>
-          <Text style={[styles.ownerName, { color: theme.textPrimary }]}>{user?.name || 'Owner'}</Text>
+        <View style={{ flex: 1 }}>
+          <Text style={[styles.greeting, { color: theme.textSecondary }]}>{greeting}</Text>
+          <Text style={[styles.ownerName, { color: theme.textPrimary }]} numberOfLines={1}>
+            {user?.name || 'Owner'}
+          </Text>
+          <Text style={[styles.dateText, { color: theme.textSecondary }]}>{today}</Text>
         </View>
-        <TouchableOpacity onPress={() => router.push('/profile/edit')}>
+        <TouchableOpacity onPress={() => router.push('/profile/edit')} style={styles.avatarBtn}>
           {user?.avatar ? (
             <Image source={{ uri: user.avatar }} style={styles.avatar} />
           ) : (
@@ -142,6 +155,7 @@ export default function OwnerDashboard() {
               </Text>
             </View>
           )}
+          <View style={[styles.onlineDot, { borderColor: theme.background }]} />
         </TouchableOpacity>
       </View>
 
@@ -152,54 +166,64 @@ export default function OwnerDashboard() {
         {/* Stats */}
         <Text style={[styles.sectionTitle, { color: theme.textPrimary }]}>Overview</Text>
         <View style={styles.statsGrid}>
-          <StatCard icon="cash-outline" label="Revenue" value={`₹${stats.revenue}`} color={COLORS.primary} theme={theme} />
-          <StatCard icon="calendar-outline" label="Total" value={stats.total} color="#6366F1" theme={theme} />
-          <StatCard icon="time-outline" label="Pending" value={stats.pending} color="#F59E0B" theme={theme} />
-          <StatCard icon="checkmark-circle-outline" label="Completed" value={stats.completed} color="#22C55E" theme={theme} />
+          {STAT_CARDS.map(stat => (
+            <StatCard key={stat.key} stat={stat} value={stats[stat.key]} theme={theme} />
+          ))}
         </View>
 
         {/* Quick Actions */}
         <Text style={[styles.sectionTitle, { color: theme.textPrimary }]}>Quick Actions</Text>
-        <View style={styles.actionsRow}>
-          <TouchableOpacity
-            style={[styles.actionCard, { backgroundColor: COLORS.primary }]}
+        <View style={[styles.quickActionsCard, { backgroundColor: theme.card, shadowColor: theme.shadow }]}>
+          <QuickAction
+            icon="cut-outline"
+            label="Services"
+            color={COLORS.primary}
             onPress={() => router.push('/(owner-tabs)/services')}
-          >
-            <Ionicons name="cut-outline" size={24} color="#FFF" />
-            <Text style={styles.actionCardText}>Manage{'\n'}Services</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.actionCard, { backgroundColor: '#6366F1' }]}
+          />
+          <View style={[styles.actionDivider, { backgroundColor: theme.border }]} />
+          <QuickAction
+            icon="calendar-outline"
+            label="Appointments"
+            color="#6366F1"
             onPress={() => router.push('/(owner-tabs)/appointments')}
-          >
-            <Ionicons name="calendar-outline" size={24} color="#FFF" />
-            <Text style={styles.actionCardText}>View All{'\n'}Appointments</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.actionCard, { backgroundColor: '#22C55E' }]}
+          />
+          <View style={[styles.actionDivider, { backgroundColor: theme.border }]} />
+          <QuickAction
+            icon="chatbubbles-outline"
+            label="Messages"
+            color="#22C55E"
             onPress={() => router.push('/(owner-tabs)/chat')}
-          >
-            <Ionicons name="chatbubbles-outline" size={24} color="#FFF" />
-            <Text style={styles.actionCardText}>Customer{'\n'}Messages</Text>
-          </TouchableOpacity>
+          />
         </View>
 
         {/* Recent Appointments */}
-        <Text style={[styles.sectionTitle, { color: theme.textPrimary }]}>Recent Appointments</Text>
-        <View style={[styles.apptCard, { backgroundColor: theme.card, shadowColor: theme.shadow }]}>
+        <View style={styles.sectionHeader}>
+          <Text style={[styles.sectionTitle, { color: theme.textPrimary, marginTop: 0, marginBottom: 0 }]}>
+            Recent Appointments
+          </Text>
+          <TouchableOpacity onPress={() => router.push('/(owner-tabs)/appointments')} activeOpacity={0.7}>
+            <Text style={[styles.viewAll, { color: COLORS.primary }]}>View All</Text>
+          </TouchableOpacity>
+        </View>
+
+        <View style={[styles.recentCard, { backgroundColor: theme.card, shadowColor: theme.shadow }]}>
           {recentAppointments.length === 0 ? (
-            <View style={styles.empty}>
-              <Ionicons name="calendar-outline" size={40} color={theme.icon} />
-              <Text style={[styles.emptyText, { color: theme.textSecondary }]}>No appointments yet</Text>
+            <View style={styles.emptyBlock}>
+              <View style={[styles.emptyIconWrap, { backgroundColor: COLORS.primaryBg }]}>
+                <Ionicons name="calendar-outline" size={28} color={COLORS.primary} />
+              </View>
+              <Text style={[styles.emptyTitle, { color: theme.textPrimary }]}>No appointments yet</Text>
+              <Text style={[styles.emptySubtitle, { color: theme.textSecondary }]}>
+                Appointments will appear here once customers book
+              </Text>
             </View>
           ) : (
-            recentAppointments.map(item => (
-              <AppointmentRow
+            recentAppointments.map((item, i) => (
+              <RecentRow
                 key={item._id}
                 item={item}
                 theme={theme}
-                onConfirm={handleConfirm}
-                onComplete={handleComplete}
+                isLast={i === recentAppointments.length - 1}
               />
             ))
           )}
@@ -214,40 +238,56 @@ export default function OwnerDashboard() {
 const styles = StyleSheet.create({
   container: { flex: 1 },
   header: {
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
-    paddingHorizontal: SPACING.md, paddingVertical: SPACING.md, borderBottomWidth: 1,
+    flexDirection: 'row', alignItems: 'center',
+    paddingHorizontal: SPACING.md, paddingVertical: SPACING.md,
+    borderBottomWidth: 1, gap: SPACING.sm,
   },
-  greeting: { fontSize: FONT_SIZE.sm },
-  ownerName: { fontSize: FONT_SIZE.xl, fontWeight: '800' },
-  avatar: { width: 42, height: 42, borderRadius: 21 },
-  avatarPlaceholder: { width: 42, height: 42, borderRadius: 21, alignItems: 'center', justifyContent: 'center' },
+  greeting: { fontSize: FONT_SIZE.sm, fontWeight: '500' },
+  ownerName: { fontSize: FONT_SIZE.xl, fontWeight: '800', marginTop: 1 },
+  dateText: { fontSize: FONT_SIZE.xs, marginTop: 2 },
+  avatarBtn: { position: 'relative' },
+  avatar: { width: 46, height: 46, borderRadius: 23 },
+  avatarPlaceholder: { width: 46, height: 46, borderRadius: 23, alignItems: 'center', justifyContent: 'center' },
   avatarInitial: { fontSize: FONT_SIZE.lg, fontWeight: '800' },
+  onlineDot: { position: 'absolute', bottom: 1, right: 1, width: 11, height: 11, borderRadius: 6, backgroundColor: '#22C55E', borderWidth: 2 },
+
   sectionTitle: { fontSize: FONT_SIZE.lg, fontWeight: '700', marginHorizontal: SPACING.md, marginTop: SPACING.lg, marginBottom: SPACING.sm },
-  statsGrid: { flexDirection: 'row', flexWrap: 'wrap', paddingHorizontal: SPACING.sm },
+  sectionHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginHorizontal: SPACING.md, marginTop: SPACING.lg, marginBottom: SPACING.sm },
+  viewAll: { fontSize: FONT_SIZE.sm, fontWeight: '600' },
+
+  statsGrid: { flexDirection: 'row', flexWrap: 'wrap', paddingHorizontal: SPACING.sm, gap: 0 },
   statCard: {
     width: '46%', margin: '2%', borderRadius: RADIUS.xl, padding: SPACING.md,
-    alignItems: 'center', shadowOpacity: 0.06, shadowRadius: 8, elevation: 2,
+    alignItems: 'flex-start', shadowOpacity: 0.06, shadowRadius: 8, elevation: 2,
   },
-  statIcon: { width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center', marginBottom: SPACING.sm },
+  statIconWrap: { width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center', marginBottom: SPACING.sm },
   statValue: { fontSize: FONT_SIZE.xxl, fontWeight: '800' },
-  statLabel: { fontSize: FONT_SIZE.xs, marginTop: 2 },
-  actionsRow: { flexDirection: 'row', paddingHorizontal: SPACING.md, gap: SPACING.sm },
-  actionCard: {
-    flex: 1, borderRadius: RADIUS.xl, padding: SPACING.md,
-    alignItems: 'center', gap: SPACING.xs,
+  statLabel: { fontSize: FONT_SIZE.xs, marginTop: 2, fontWeight: '500' },
+
+  quickActionsCard: {
+    flexDirection: 'row', marginHorizontal: SPACING.md, borderRadius: RADIUS.xl,
+    shadowOpacity: 0.06, shadowRadius: 8, elevation: 2, overflow: 'hidden',
   },
-  actionCardText: { color: '#FFF', fontSize: FONT_SIZE.xs, fontWeight: '600', textAlign: 'center' },
-  apptCard: { marginHorizontal: SPACING.md, borderRadius: RADIUS.xl, shadowOpacity: 0.06, shadowRadius: 8, elevation: 2, overflow: 'hidden' },
-  apptRow: { flexDirection: 'row', alignItems: 'center', padding: SPACING.md, borderBottomWidth: 1 },
-  apptInfo: { flex: 1 },
-  apptCustomer: { fontSize: FONT_SIZE.md, fontWeight: '700' },
-  apptService: { fontSize: FONT_SIZE.sm, marginTop: 2 },
-  apptTime: { fontSize: FONT_SIZE.xs, marginTop: 2 },
-  apptRight: { alignItems: 'flex-end', gap: 6 },
-  statusBadge: { paddingHorizontal: 8, paddingVertical: 3, borderRadius: RADIUS.full },
-  statusText: { fontSize: FONT_SIZE.xs, fontWeight: '600' },
-  actionBtn: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: RADIUS.full },
-  actionBtnText: { color: '#FFF', fontSize: FONT_SIZE.xs, fontWeight: '600' },
-  empty: { alignItems: 'center', padding: SPACING.xl },
-  emptyText: { marginTop: SPACING.sm, fontSize: FONT_SIZE.sm },
+  quickAction: { flex: 1, alignItems: 'center', paddingVertical: SPACING.md, gap: SPACING.xs },
+  quickActionIcon: { width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center' },
+  quickActionLabel: { fontSize: FONT_SIZE.xs, fontWeight: '700' },
+  actionDivider: { width: 1, marginVertical: SPACING.md },
+
+  recentCard: { marginHorizontal: SPACING.md, borderRadius: RADIUS.xl, shadowOpacity: 0.06, shadowRadius: 8, elevation: 2, overflow: 'hidden' },
+  recentRow: { flexDirection: 'row', alignItems: 'center', padding: SPACING.md, borderBottomWidth: 1, gap: SPACING.sm },
+  recentAvatar: { width: 42, height: 42, borderRadius: 21, alignItems: 'center', justifyContent: 'center', overflow: 'hidden' },
+  recentAvatarImg: { width: 42, height: 42, borderRadius: 21 },
+  recentAvatarText: { fontSize: FONT_SIZE.md, fontWeight: '800' },
+  recentInfo: { flex: 1 },
+  recentName: { fontSize: FONT_SIZE.sm, fontWeight: '700' },
+  recentService: { fontSize: FONT_SIZE.xs, marginTop: 1 },
+  recentMeta: { flexDirection: 'row', alignItems: 'center', gap: 3, marginTop: 3 },
+  recentTime: { fontSize: FONT_SIZE.xs },
+  statusPill: { paddingHorizontal: 9, paddingVertical: 4, borderRadius: RADIUS.full },
+  statusPillText: { fontSize: 10, fontWeight: '700' },
+
+  emptyBlock: { alignItems: 'center', padding: SPACING.xl, gap: SPACING.sm },
+  emptyIconWrap: { width: 60, height: 60, borderRadius: 30, alignItems: 'center', justifyContent: 'center' },
+  emptyTitle: { fontSize: FONT_SIZE.md, fontWeight: '700', marginTop: SPACING.xs },
+  emptySubtitle: { fontSize: FONT_SIZE.sm, textAlign: 'center' },
 });
