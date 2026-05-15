@@ -5,17 +5,21 @@ import { PageLoader } from '../src/components/common/Loader';
 
 export default function Index() {
   const router = useRouter();
-  const { isAuthenticated, isLoading } = useAuthStore();
+  const { isAuthenticated, isLoading, user } = useAuthStore();
 
   useEffect(() => {
     if (!isLoading) {
       if (isAuthenticated) {
-        router.replace('/(tabs)');
+        if (user?.role === 'salon_owner') {
+          router.replace('/(owner-tabs)');
+        } else {
+          router.replace('/(tabs)');
+        }
       } else {
         router.replace('/(auth)/login');
       }
     }
-  }, [isLoading, isAuthenticated]);
+  }, [isLoading, isAuthenticated, user]);
 
   return <PageLoader />;
 }
