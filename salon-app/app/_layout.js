@@ -34,7 +34,7 @@ function AppContent() {
         <Stack.Screen name="help/index" />
         <Stack.Screen name="chat/[id]" />
       </Stack>
-      <Toast />
+      <Toast position="bottom" bottomOffset={40} />
     </>
   );
 }

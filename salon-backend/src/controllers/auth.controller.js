@@ -58,9 +58,17 @@ export const verifyOTP = asyncHandler(async (req, res) => {
   user.isVerified = true;
   user.otp = undefined;
   user.otpExpiry = undefined;
+
+  const accessToken = signToken(user._id);
+  const refreshToken = signRefreshToken(user._id);
+  user.refreshToken = refreshToken;
   await user.save();
 
-  success(res, 'Email verified successfully');
+  success(res, 'Email verified successfully', {
+    token: accessToken,
+    refreshToken,
+    user: { _id: user._id, name: user.name, email: user.email, role: user.role, avatar: user.avatar },
+  });
 });
 
 export const resendOTP = asyncHandler(async (req, res) => {
