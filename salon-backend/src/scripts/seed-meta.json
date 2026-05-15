@@ -1,0 +1,27 @@
+{
+  "createdAt": "2026-05-15T06:42:45.670Z",
+  "userIds": [
+    "6a06c0638ae178f03a01a2b8",
+    "6a06c0648ae178f03a01a2b9"
+  ],
+  "salonId": "6a06c0658ae178f03a01a2ba",
+  "serviceIds": [
+    "6a06c0658ae178f03a01a2c0",
+    "6a06c0658ae178f03a01a2c1",
+    "6a06c0658ae178f03a01a2c2",
+    "6a06c0658ae178f03a01a2c3",
+    "6a06c0658ae178f03a01a2c4",
+    "6a06c0658ae178f03a01a2c5",
+    "6a06c0658ae178f03a01a2c6",
+    "6a06c0658ae178f03a01a2c7"
+  ],
+  "staffIds": [
+    "6a06c0658ae178f03a01a2c8",
+    "6a06c0658ae178f03a01a2c9"
+  ],
+  "appointmentIds": [
+    "6a06c0658ae178f03a01a2ca",
+    "6a06c0658ae178f03a01a2cb",
+    "6a06c0658ae178f03a01a2cc"
+  ]
+}
