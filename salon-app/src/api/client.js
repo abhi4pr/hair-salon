@@ -1,7 +1,7 @@
 import axios from "axios";
 import * as SecureStore from "expo-secure-store";
 
-const BASE_URL = "https://hair-salon-rffa.onrender.com/api"; // Android emulator localhost
+const BASE_URL = "https://hair-salon-opal.vercel.app/api"; // Android emulator localhost
 
 const client = axios.create({
   baseURL: BASE_URL,
